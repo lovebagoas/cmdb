@@ -14,7 +14,10 @@
                     <a href="#"><i class="fa fa-group"></i> <span class="nav-label">Go Project</span><span
                             class="fa arrow"></span></a>
                     <ul class="nav nav-second-level">
-                        <!--li class="group"><a href="{% url 'gobuild' %}">部署</a></li-->
+{#                        <!--li class="group"><a href="{% url 'gobuild' %}">部署</a></li-->#}
+                        <li class="init_project"><a href="{% url 'initProject' %}">发布流程</a></li>
+{#                        <li class="my_publish"><a href="#">我的发布</a></li>#}
+                        <li class="my_approval"><a href="#">发布审批</a></li>
                         <li class="group"><a href="{% url 'get' %}">发布</a></li>
                         <li class="user"><a href="{% url 'goConf' %}">更新配置文件<span class="label pull-right"></span></a>
                         </li>

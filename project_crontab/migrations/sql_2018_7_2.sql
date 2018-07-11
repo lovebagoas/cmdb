@@ -1,6 +1,7 @@
-CREATE TABLE `project_crontab_crontabcmd` (`id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY, `cmd` longtext NOT NULL, `auto_cmd` longtext NOT NULL, `frequency` varchar(16) NOT NULL, `cmd_status` integer NOT NULL, `is_valid` integer NOT NULL, `create_time` datetime(6) NULL, `update_time` datetime(6) NULL, `last_run_result` varchar(16) NULL,`last_run_time` datetime(6) NULL, `creator_id` integer NOT NULL);
+use cmdb;
+CREATE TABLE `project_crontab_crontabcmd` (`id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY, `cmd` longtext NOT NULL, `auto_cmd` longtext NOT NULL, `frequency` varchar(16) NOT NULL, `cmd_status` integer NOT NULL, `is_valid` integer NOT NULL, `create_time` datetime NULL, `update_time` datetime NULL, `last_run_result` varchar(16) NULL,`last_run_time` datetime NULL, `creator_id` integer NOT NULL);
  
-CREATE TABLE `project_crontab_svn` (`id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY, `project_name` varchar(64) NOT NULL, `username` varchar(32) NOT NULL, `password` varchar(32) NOT NULL, `repo` varchar(128) NOT NULL, `local_path` varchar(64) NOT NULL, `create_time` datetime(6) NULL, `update_time` datetime(6) NULL, `creator_id` integer NOT NULL,`salt_minion_id` integer NOT NULL, `updater_id` integer NULL);
+CREATE TABLE `project_crontab_svn` (`id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY, `project_name` varchar(64) NOT NULL, `username` varchar(32) NOT NULL, `password` varchar(32) NOT NULL, `repo` varchar(128) NOT NULL, `local_path` varchar(64) NOT NULL, `create_time` datetime NULL, `update_time` datetime NULL, `creator_id` integer NOT NULL,`salt_minion_id` integer NOT NULL, `updater_id` integer NULL);
  
 ALTER TABLE `project_crontab_crontabcmd` ADD COLUMN `svn_id` integer NOT NULL;
 ALTER TABLE `project_crontab_crontabcmd` ALTER COLUMN `svn_id` DROP DEFAULT;
@@ -27,3 +28,5 @@ CREATE INDEX `asset_crontab_svn_30148987` ON `asset_crontab_svn` (`minion_hostna
 ALTER TABLE `asset_crontab_svn` DROP FOREIGN KEY `asset_crontab_svn_hostname_id_c6ccdf3d_fk_asset_cron_minion_id`;
 ALTER TABLE `asset_crontab_svn` MODIFY `hostname_id` integer NULL;
 ALTER TABLE `asset_crontab_svn` ADD CONSTRAINT `asset_crontab_svn_hostname_id_c6ccdf3d_fk_asset_minion_id` FOREIGN KEY (`hostname_id`) REFERENCES `asset_minion` (`id`);
+
+alter table `project_crontab_crontabcmd` drop column `is_valid`;

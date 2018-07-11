@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'consul_kv',
     'disque',
     'project_crontab',
+    'publish',
 ]
 
 MIDDLEWARE_CLASSES = [

@@ -135,7 +135,7 @@ class EZUser(object):
 
 @login_required
 def user_list(request):
-    users_list = User.objects.all()
+    users_list = User.objects.all().order_by('username')
     paginator = Paginator(users_list,10)
     page = request.GET.get('page')
 
@@ -163,7 +163,8 @@ def user_add(request):
         password = request.POST.get('password')
         group_id = request.POST.getlist('group_id')
         phone = request.POST.get('phone')
-        info = User.objects.create_user(username=name,password=password,first_name=full_name)
+        email = name + '@ezbuy.com'
+        info = User.objects.create_user(username=name,password=password,first_name=full_name,email=email)
         UserProfile.objects.create(phone_number=phone, user=info)
         for id in group_id:
             info.groups.add(id)
@@ -232,10 +233,12 @@ def user_edit(request, id):
             password = request.POST.get('password')
             group_id = request.POST.getlist('group_id')
             phone = request.POST.get('phone')
+            email = request.POST.get('email')
 
             print '-------%s--%s-------%s--%s' % (name,full_name,group_id,phone)
             user_info.username = name
             user_info.first_name = full_name
+            user_info.email = email
             phone_obj = UserProfile.objects.get(user=user_info)
             phone_obj.phone_number = phone
             phone_obj.save()

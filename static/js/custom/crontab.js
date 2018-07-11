@@ -10,6 +10,11 @@ $(document).ready(function () {
         let minion_id = $("#minion_select").val();
         let cmd = $("#cmd").val().trim();
         let frequency = $("#frequency").val().trim();
+        if (!minion_id || !cmd || !frequency){
+            alert("请填写必填内容");
+            return false;
+        }
+
         if (minion_id.length === 0 || cmd.length === 0 || frequency.length === 0) {
             alert("请填写必填内容");
             return false;

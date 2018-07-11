@@ -41,6 +41,7 @@
                                         <th class="text-center"> 用户名 </th>
                                         <th class="text-center"> 姓名 </th>
                                         <th class="text-center"> 电话 </th>
+                                        <th class="text-center"> 邮箱 </th>
                                         <th class="text-center"> 状态 </th>
                                         <th class="text-center"> 操作 </th>
                                     </tr>
@@ -48,9 +49,10 @@
                                 <tbody>
                                 {% for info in user_list %}
                                     <tr class="gradeX">
-                                        <td class="text-center"> {{ info.username }}</a></td>
+                                        <td class="text-center"> {{ info.username }}</td>
                                         <td class="text-center"> {{ info.first_name }} </td>
                                         <td class="text-center"> {{ info.userprofile.phone_number }} </td>
+                                        <td class="text-center">{% if info.email %} {{ info.email }} {% else %} {% endif %}</td>
                                         {% if info.is_active %}
                                             <td class="text-center">有效</td>
                                             <td class="text-center">
