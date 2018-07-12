@@ -2,7 +2,7 @@
 
 from django.db import models
 from django.contrib.auth.models import User
-from asset.models import gogroup
+from asset.models import gogroup, goservices
 
 
 class MailGroup(models.Model):
@@ -83,4 +83,27 @@ class Festival(models.Model):
 
     class Meta:
         verbose_name = u"节假日"
+        verbose_name_plural = verbose_name
+
+
+class PublishSheet(models.Model):
+    STATUS = (
+        ('1', u'审批中'),
+        ('2', u'完成审批'),
+        ('3', u'完成发布'),
+    )
+    creator = models.ForeignKey(User, verbose_name=u"创建者", related_name="creator_of_publishsheet", default=1)
+    goservices = models.ManyToManyField(goservices, verbose_name=u'重启服务', related_name='publish_goservices')
+    tapd_url = models.CharField(max_length=256, verbose_name=u"TAPD URL")
+    publish_date = models.CharField(max_length=32, verbose_name=u"发布日期")
+    publish_time = models.CharField(max_length=32, verbose_name=u"发布开始时间")
+    sql = models.TextField(verbose_name=u"执行SQL", blank=True, null=True)
+    consul_key = models.CharField(max_length=100, verbose_name=u"consul key", blank=True, null=True)
+    status = models.CharField(choices=STATUS, max_length=32, verbose_name=u"发布单状态", default='1')
+
+    def __unicode__(self):
+        return self.tapd_url
+
+    class Meta:
+        verbose_name = u"发布单"
         verbose_name_plural = verbose_name

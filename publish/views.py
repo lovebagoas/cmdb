@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 
 from publish import models
 from asset import models as asset_models
+from publish import utils
 
 
 @login_required
@@ -34,14 +35,13 @@ def initProject(request):
             projectinfo_dict[project_name].append(level_dict)
 
     project_tuple = sorted(projectinfo_dict.items(), key=lambda d: d[0])
-    print project_tuple
     return render(request, 'publish/gogroup_init.html',
                   {'gogroup_objs': gogroup_objs, 'mailgroup_objs': mailgroup_objs, 'user_objs': user_objs, 'project_tuple': project_tuple})
 
 
 @login_required
 def createProject(request):
-    project_id = int(request.POST['project_id'])
+    project_name = request.POST['project_name']
     owner_select_list = request.POST.getlist('owner_select_list')
     owner_list = [int(i) for i in owner_select_list]
     first_select_list = request.POST.getlist('first_select_list')
@@ -54,7 +54,7 @@ def createProject(request):
     errcode = 0
     msg = 'ok'
     try:
-        gogroup_obj = asset_models.gogroup.objects.get(id=project_id)
+        gogroup_obj = asset_models.gogroup.objects.get(name=project_name)
     except asset_models.gogroup.DoesNotExist:
         errcode = 500
         msg = u'所选项目在数据库中不存在'
@@ -105,3 +105,62 @@ def createProject(request):
 
     data = dict(code=errcode, msg=msg)
     return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+@login_required
+def PublishSheetList(request):
+    publishsheet_objs = models.PublishSheet.objects.all().order_by('status')
+    publishsheet_list = utils.serialize_queryset(publishsheet_objs)
+    print 'publishsheet_list : '
+    print publishsheet_list
+
+    errcode = 0
+    msg = 'ok'
+    data = dict(code=errcode, msg=msg, content=publishsheet_list)
+    return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+@login_required
+def createPublishSheet(request):
+    user = request.user
+    env_id = request.POST['env_id']
+    tapd_url = request.POST['tapd_url']
+    reboot_services_list = request.POST.getlist('reboot_services_list', [])
+    publish_date = request.POST['publish_date']
+    publish_time = request.POST['publish_time']
+    sql = request.POST['sql']
+    consul_key = request.POST['consul_key']
+
+    errcode = 0
+    msg = 'ok'
+
+    goservices_objs = asset_models.goservices.objects.filter(env=env_id).filter(name__in=reboot_services_list)
+    publishsheet_obj = models.PublishSheet()
+    publishsheet_obj.creator = user
+    publishsheet_obj.tapd_url = tapd_url
+    publishsheet_obj.publish_date = publish_date
+    publishsheet_obj.publish_time = publish_time
+    if sql:
+        publishsheet_obj.sql = sql
+
+    if consul_key:
+        publishsheet_obj.consul_key = consul_key
+
+    publishsheet_obj.save()
+
+    for goservice in goservices_objs:
+        publishsheet_obj.goservices.add(goservice)
+
+    data = dict(code=errcode, msg=msg)
+    return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+@login_required
+def ApproveList(request):
+    user = request.user
+    publishsheet_objs = models.PublishSheet.objects.all().order_by('status')
+
+    return render(request, 'publish/approve.html',
+                  {'publishsheet_objs': publishsheet_objs})
+
+

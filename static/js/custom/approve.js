@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    init_tab1();
+    init_tab2();
     init_approval_level();
 
 });
@@ -178,104 +178,6 @@ function init_approval_level() {
     });
 }
 
-$('#add_level_select').click(function () {
-    let level_obj = document.getElementsByClassName("select-level");
-    // let level_str = level_obj[0].outerHTML;
-
-    let append_str = " <div class='select-level ibox'>\n" +
-        "                                                <div class='ibox-tools'>\n" +
-        "                                                    <a class='close-level-set'>\n" +
-        "                                                        <i class='fa fa-times' style='color: #ed5565'></i>\n" +
-        "                                                    </a>\n" +
-        "                                                </div>\n" +
-        "\n" +
-        "                                                <form role='form'>\n" +
-        "                                                    <div class='row'>\n" +
-        "                                                        <div class='col-lg-6'>\n" +
-        "                                                            <div class='form-group'>\n" +
-        "                                                                <label>起始日</label>\n" +
-        "                                                                <select class='form-control weekday-start'>\n" +
-        "                                                                    <option value=1>周一</option>\n" +
-        "                                                                    <option value=2>周二</option>\n" +
-        "                                                                    <option value=3>周三</option>\n" +
-        "                                                                    <option value=4>周四</option>\n" +
-        "                                                                    <option value=5>周五</option>\n" +
-        "                                                                    <option value=6>周六</option>\n" +
-        "                                                                    <option value=7>周日</option>\n" +
-        "                                                                </select>\n" +
-        "                                                            </div>\n" +
-        "                                                        </div>\n" +
-        "                                                        <div class='col-lg-6'>\n" +
-        "                                                            <div class='form-group'>\n" +
-        "                                                                <label>截止日</label>\n" +
-        "                                                                <select class='form-control weekday-end'>\n" +
-        "                                                                    <option value=1>周一</option>\n" +
-        "                                                                    <option value=2>周二</option>\n" +
-        "                                                                    <option value=3>周三</option>\n" +
-        "                                                                    <option value=4>周四</option>\n" +
-        "                                                                    <option value=5>周五</option>\n" +
-        "                                                                    <option value=6>周六</option>\n" +
-        "                                                                    <option value=7 selected>周日</option>\n" +
-        "                                                                </select>\n" +
-        "                                                            </div>\n" +
-        "                                                        </div>\n" +
-        "                                                    </div>\n" +
-        "\n" +
-        "                                                    <div class='row'>\n" +
-        "                                                        <div class='col-lg-6'>\n" +
-        "                                                            <div class='form-group'>\n" +
-        "                                                                <label>起始时间</label>\n" +
-        "                                                                <div class='input-group bootstrap-timepicker timepicker'>\n" +
-        "                                                                    <input type='text'\n" +
-        "                                                                           class='form-control input-small timepicker start-time'>\n" +
-        "                                                                    <span class='input-group-addon'><i\n" +
-        "                                                                            class='glyphicon glyphicon-time'></i></span>\n" +
-        "                                                                </div>\n" +
-        "                                                            </div>\n" +
-        "                                                        </div>\n" +
-        "                                                        <div class='col-lg-6'>\n" +
-        "                                                            <div class='form-group'>\n" +
-        "                                                                <label>截止时间</label>\n" +
-        "                                                                <div class='input-group bootstrap-timepicker timepicker'>\n" +
-        "                                                                    <input type='text'\n" +
-        "                                                                           class='form-control input-small timepicker end-time'>\n" +
-        "                                                                    <span class='input-group-addon'><i\n" +
-        "                                                                            class='glyphicon glyphicon-time'></i></span>\n" +
-        "                                                                </div>\n" +
-        "                                                            </div>\n" +
-        "                                                        </div>\n" +
-        "                                                    </div>\n" +
-        "\n" +
-        "                                                    <div class='row'>\n" +
-        "                                                        <div class='col-lg-12'>\n" +
-        "                                                            <div class='form-group'>\n" +
-        "                                                                <label>审批级别</label>\n" +
-        "                                                                <select class='form-control level-select'>\n" +
-        "                                                                    <option value='1' selected>无需审批</option>\n" +
-        "                                                                    <option value='2'>一级审批</option>\n" +
-        "                                                                    <option value='3'>二级审批</option>\n" +
-        "                                                                </select>\n" +
-        "                                                            </div>\n" +
-        "                                                        </div>\n" +
-        "                                                    </div>\n" +
-        "                                                </form>\n" +
-        "                                                <br>\n" +
-        "                                            </div> ";
-
-
-    $('#level_select').append(append_str);
-    init_approval_level();
-    $('.close-level-set').click(function () {
-        let content = $(this).closest('div.ibox');
-        if (level_obj.length != 1) {
-            content.remove();
-        }
-        else {
-            return false;
-        }
-    });
-});
-
 $('#create_projectinfo').click(function () {
     let project_select = $('#project_select').val();
     let owner_select_list = $('#owner_select').val();
@@ -379,14 +281,7 @@ $("#create_publishsheet").click(function () {
         },
         success: function (result) {
             if (result.code === 0) {
-                document.getElementById('createTab').style.display = 'none';
-                $("#projectInfo").removeClass("active");
-                $("#tab-1").removeClass("active");
-                $("#createTab").removeClass("active");
-                $("#tab-3").removeClass("active");
-                $("#publishSheet").addClass("active");
-                $("#tab-2").addClass("active");
-                init_tab2();
+                window.location.reload();
             }
             else {
                 alert(result.msg);

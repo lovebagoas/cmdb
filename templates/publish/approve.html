@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% include 'link_css.html' %}
+{% block self_head_css_js %}
+    <link href="/static/css/new_style.css" rel="stylesheet">
+    <link href="/static/alert/select2.min.css" rel="stylesheet">
+    <link href="/static/css/plugins/timepicker/bootstrap-timepicker.min.css" rel="stylesheet">
+    <link href="/static/css/plugins/datepicker/datepicker3.css" rel="stylesheet">
+{% endblock %}
+{% block self_footer_js %}
+    <script src="/static/alert/select2.min.js"></script>
+    <script src="/static/js/timepicker/bootstrap-timepicker.js"></script>
+    <script src="/static/js/datapicker/bootstrap-datepicker.js"></script>
+{% endblock %}
+{% block content %}
+    <div class="tabs-container">
+        <ul class="nav nav-tabs">
+            <li id="publishSheet" class="active"><a data-toggle="tab" href="#tab-2">审批发布单</a></li>
+        </ul>
+        <div class="tab-content">
+            <div id="tab-2" class="tab-pane active">
+                <div class="wrapper wrapper-content animated fadeInRight">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="ibox">
+                                <div class="ibox-content">
+                                    <div class="text-center">
+                                        <h3>待审批
+                                        </h3>
+                                        <p class="small"><i class="fa fa-clock-o"></i> 请在发布时间前审批</p>
+                                    </div>
+
+                                    <ul class="sortable-list connectList agile-list ui-sortable" id="todo">
+                                        <li class="warning-element">
+                                            www.dfjsal.com
+                                            <div class="agile-detail">
+                                                <a href="#" class="pull-right btn btn-xs btn-danger">审批</a>
+                                                <i class="fa fa-clock-o"></i> 2018-07-24 12:00
+                                            </div>
+                                        </li>
+                                        <li class="warning-element">
+                                            www.dfjsal.com
+                                            <div class="agile-detail">
+                                                <a href="#" class="pull-right btn btn-xs btn-danger">审批</a>
+                                                <i class="fa fa-clock-o"></i> 2018-07-24 12:00
+                                            </div>
+                                        </li>
+                                        <li class="warning-element">
+                                            www.dfjsal.com
+                                            <div class="agile-detail">
+                                                <a href="#" class="pull-right btn btn-xs btn-danger">审批</a>
+                                                <i class="fa fa-clock-o"></i> 2018-07-24 12:00
+                                            </div>
+                                        </li>
+                                        <li class="warning-element">
+                                            www.dfjsal.com
+                                            <div class="agile-detail">
+                                                <a href="#" class="pull-right btn btn-xs btn-danger">审批</a>
+                                                <i class="fa fa-clock-o"></i> 2018-07-24 12:00
+                                            </div>
+                                        </li>
+                                        <li class="warning-element">
+                                            www.dfjsal.com
+                                            <div class="agile-detail">
+                                                <a href="#" class="pull-right btn btn-xs btn-danger">审批</a>
+                                                <i class="fa fa-clock-o"></i> 2018-07-24 12:00
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="ibox">
+                                <div class="ibox-content">
+                                    <div class="text-center">
+                                        <h3>审批通过</h3>
+                                        <p class="small"><i class="fa fa-check-square-o"></i> 审批通过，待发布</p>
+                                    </div>
+
+                                    <ul class="sortable-list connectList agile-list ui-sortable" id="completed">
+                                        <li class="success-element">
+                                            www.dfjsal.com
+                                            <div class="agile-detail">
+                                                <a href="#" class="pull-right btn btn-xs btn-default">查看</a>
+                                                <i class="fa fa-clock-o"></i> 2018-07-24 12:00
+                                            </div>
+                                        </li>
+                                        <li class="success-element">
+                                            www.dfjsal.com
+                                            <div class="agile-detail">
+                                                <a href="#" class="pull-right btn btn-xs btn-default">查看</a>
+                                                <i class="fa fa-clock-o"></i> 2018-07-24 12:00
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="ibox">
+                                <div class="ibox-content">
+                                    <div class="text-center">
+                                        <h3>审批拒绝</h3>
+                                        <p class="small" style="color: darkorange"><i class="fa fa-warning"></i> 不通过</p>
+                                    </div>
+                                    <ul class="sortable-list connectList agile-list ui-sortable"
+                                        id="inprogress">
+                                        <li class="info-element">
+                                            www.dfjsal.com
+                                            <div class="agile-detail">
+                                                <a href="#" class="pull-right btn btn-xs btn-default">查看</a>
+                                                <i class="fa fa-clock-o"></i> 2018-07-24 12:00
+                                            </div>
+                                        </li>
+                                        <li class="info-element">
+                                            www.dfjsal.com
+                                            <div class="agile-detail">
+                                                <a href="#" class="pull-right btn btn-xs btn-default">查看</a>
+                                                <i class="fa fa-clock-o"></i> 2018-07-24 12:00
+                                            </div>
+                                        </li>
+                                        <li class="info-element">
+                                            www.dfjsal.com
+                                            <div class="agile-detail">
+                                                <a href="#" class="pull-right btn btn-xs btn-default">查看</a>
+                                                <i class="fa fa-clock-o"></i> 2018-07-24 12:00
+                                            </div>
+                                        </li>
+                                        <li class="info-element">
+                                            www.dfjsal.com
+                                            <div class="agile-detail">
+                                                <a href="#" class="pull-right btn btn-xs btn-default">查看</a>
+                                                <i class="fa fa-clock-o"></i> 2018-07-24 12:00
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script src="/static/js/custom/approve.js"></script>
+
+{% endblock %}
