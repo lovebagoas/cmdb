@@ -92,6 +92,7 @@ class PublishSheet(models.Model):
         ('2', u'审批拒绝'),
         ('3', u'审批通过'),
         ('4', u'完成发布'),
+        ('5', u'虽审批通过，但超时未发布'),
     )
     creator = models.ForeignKey(User, verbose_name=u"创建者", related_name="creator_of_publishsheet", default=1)
     goservices = models.ManyToManyField(goservices, verbose_name=u'重启服务', related_name='publish_goservices')
@@ -103,11 +104,34 @@ class PublishSheet(models.Model):
     status = models.CharField(choices=STATUS, max_length=32, verbose_name=u"发布单状态", default='1')
     project_info = models.ForeignKey(ProjectInfo, blank=True, null=True)
     approval_level = models.ForeignKey(ApprovalLevel, blank=True, null=True)
-    refuse_reason = models.TextField(verbose_name=u"审批拒绝原因", blank=True, null=True)
 
     def __unicode__(self):
         return self.tapd_url
 
     class Meta:
         verbose_name = u"发布单"
+        verbose_name_plural = verbose_name
+
+
+class PublishApprovalHistory(models.Model):
+    APPROVE_STATUS = (
+        ('1', u'通过'),
+        ('2', u'拒绝'),
+    )
+    publish_sheet = models.ForeignKey(PublishSheet)
+    approve_count = models.PositiveSmallIntegerField(verbose_name=u"审批次数", default=1)
+    approve_status = models.CharField(choices=APPROVE_STATUS, max_length=32, verbose_name=u"审批状态", default='1')
+    refuse_reason = models.TextField(verbose_name=u"拒绝原因", blank=True, null=True)
+    first_approver = models.ForeignKey(User, verbose_name=u'第一审批人', related_name='sheet_first_approver', blank=True, null=True)
+    first_approve_time = models.DateTimeField(verbose_name=u'第一审批时间', auto_now_add=True, blank=True, null=True)
+    first_notices = models.TextField(verbose_name=u"第一审批人批注的注意事项", blank=True, null=True)
+    second_approver = models.ForeignKey(User, verbose_name=u'第二审批人', related_name='sheet_second_approver', blank=True, null=True)
+    second_approve_time = models.DateTimeField(verbose_name=u'第二审批时间', auto_now_add=True, blank=True, null=True)
+    second_notices = models.TextField(verbose_name=u"第二审批人批注的注意事项", blank=True, null=True)
+
+    def __unicode__(self):
+        return self.publish_sheet.tapd_url
+
+    class Meta:
+        verbose_name = u"发布单审批历史"
         verbose_name_plural = verbose_name

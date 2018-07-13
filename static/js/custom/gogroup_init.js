@@ -6,7 +6,6 @@ $(document).ready(function () {
 
 function init_tab1() {
     $('#project_select').select2({
-        minimumResultsForSearch: Infinity,
         language: 'zh-CN',
         width: '100%',
         placeholder: '请选择',
@@ -53,23 +52,29 @@ function init_tab2() {
 
 $("#projectInfo").click(function () {
     document.getElementById('createTab').style.display = 'none';
+    document.getElementById('doneSheet').style.display = 'none';
     $("#publishSheet").removeClass("active");
     $("#tab-2").removeClass("active");
     $("#createTab").removeClass("active");
     $("#tab-3").removeClass("active");
     $("#projectInfo").addClass("active");
     $("#tab-1").addClass("active");
+    $("#doneSheet").removeClass("active");
+    $("#tab-4").removeClass("active");
     init_tab1();
 });
 
 $("#publishSheet").click(function () {
     document.getElementById('createTab').style.display = 'none';
+    document.getElementById('doneSheet').style.display = 'none';
     $("#projectInfo").removeClass("active");
     $("#tab-1").removeClass("active");
     $("#createTab").removeClass("active");
     $("#tab-3").removeClass("active");
     $("#publishSheet").addClass("active");
     $("#tab-2").addClass("active");
+    $("#doneSheet").removeClass("active");
+    $("#tab-4").removeClass("active");
     init_tab2();
 });
 
@@ -305,12 +310,15 @@ $("#create_publishsheet").click(function () {
         success: function (result) {
             if (result.code === 0) {
                 document.getElementById('createTab').style.display = 'none';
+                document.getElementById('doneSheet').style.display = 'none';
                 $("#projectInfo").removeClass("active");
                 $("#tab-1").removeClass("active");
                 $("#createTab").removeClass("active");
                 $("#tab-3").removeClass("active");
                 $("#publishSheet").addClass("active");
                 $("#tab-2").addClass("active");
+                $("#doneSheet").removeClass("active");
+                $("#tab-4").removeClass("active");
                 init_tab2();
             }
             else {
@@ -326,3 +334,40 @@ $("#create_publishsheet").click(function () {
         }
     });
 });
+
+$("#done_sheets").click(function () {
+    document.getElementById('createTab').style.display = 'none';
+    document.getElementById('doneSheet').style.display = '';
+    $("#projectInfo").removeClass("active");
+    $("#tab-1").removeClass("active");
+    $("#publishSheet").removeClass("active");
+    $("#tab-2").removeClass("active");
+    $("#createTab").removeClass("active");
+    $("#tab-3").removeClass("active");
+
+    $("#doneSheet").addClass("active");
+    $("#tab-4").addClass("active");
+    init_tab4();
+});
+
+
+function init_tab4() {
+    let url = '/asset/publishsheet/list/done';
+    $.ajax({
+        url: url,
+        type: "GET",
+        beforeSend: function () {
+            $("#page_loading").show();
+        },
+        success: function (result) {
+            if (result.length > 0) {
+                $("#done_outtime_sheet").html(result);
+            }
+            $("#page_loading").hide();
+        },
+        error: function () {
+            alert('失败');
+            $("#page_loading").hide();
+        }
+    });
+}

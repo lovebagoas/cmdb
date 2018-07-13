@@ -7,6 +7,7 @@ urlpatterns = patterns('',
                        url(r'^createProject/$', createProject, name='createProject'),
                        url(r'^publishsheet/create/$', createPublishSheet, name='createPublishSheet'),
                        url(r'^publishsheet/list/$', PublishSheetList, name='PublishSheetList'),
+                       url(r'^publishsheet/list/done/$', PublishSheetDoneList, name='PublishSheetDoneList'),
                        url(r'^approve/list/$', ApproveList, name='ApproveList'),
                        url(r'^approve/init/$', ApproveInit, name='ApproveInit'),
                        )

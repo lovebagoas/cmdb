@@ -1,4 +1,4 @@
-<div class="col-lg-3">
+<div class="col-lg-4">
     <div class="ibox">
         <div class="ibox-content">
             <div class="text-center">
@@ -18,7 +18,14 @@
                         环境：{{ sheet.env }}<br>
                         服务：{{ sheet.services_str }}<br>
                         TAPD：{{ sheet.tapd_url }}<br>
-                        审批级别：{{ sheet.level }}
+                        审批级别：
+                        {% if sheet.approve_level == '1' %}
+                            <span>{{ sheet.level }}</span>
+                        {% elif sheet.approve_level == '2' %}
+                            <span style="color: #0e9aef">{{ sheet.level }}</span>
+                        {% elif sheet.approve_level == '3' %}
+                            <span style="color: orange">{{ sheet.level }}</span>
+                        {% endif %}
 
                         <div class="agile-detail">
                             <i class="fa fa-clock-o"></i> {{ sheet.publish_date }} {{ sheet.publish_time }}
@@ -31,12 +38,12 @@
         </div>
     </div>
 </div>
-<div class="col-lg-3">
+<div class="col-lg-4">
     <div class="ibox">
         <div class="ibox-content">
             <div class="text-center">
                 <h3>审批拒绝</h3>
-                <p class="small" style="color: #ed5565"><i class="fa fa-warning"></i> 如有需要，请修改后重新提交发布单</p>
+                <p class="small" style="color: #ed5565"><i class="fa fa-warning"></i> 如有需要，请重新提交发布单</p>
             </div>
             <ul class="sortable-list connectList agile-list ui-sortable"
                 id="approve_refused">
@@ -46,7 +53,14 @@
                         环境：{{ sheet.env }}<br>
                         服务：{{ sheet.services_str }}<br>
                         TAPD：{{ sheet.tapd_url }}<br>
-                        审批级别：{{ sheet.level }}
+                        审批级别：
+                        {% if sheet.approve_level == '1' %}
+                            <span>{{ sheet.level }}</span>
+                        {% elif sheet.approve_level == '2' %}
+                            <span style="color: #0e9aef">{{ sheet.level }}</span>
+                        {% elif sheet.approve_level == '3' %}
+                            <span style="color: orange">{{ sheet.level }}</span>
+                        {% endif %}
                         <div class="agile-detail">
                             <i class="fa fa-clock-o"></i> {{ sheet.publish_date }} {{ sheet.publish_time }}
                             <a href="javascript:void(0)" class="pull-right btn btn-xs btn-danger">原因</a>
@@ -57,12 +71,12 @@
         </div>
     </div>
 </div>
-<div class="col-lg-3">
+<div class="col-lg-4">
     <div class="ibox">
         <div class="ibox-content">
             <div class="text-center">
                 <h3>审批通过，待发布</h3>
-                <p class="small" style="color: darkorange"><i class="fa fa-warning"></i> 审批完成，请在合理时间段内完成发布</p>
+                <p class="small" style="color: darkorange"><i class="fa fa-warning"></i> 审批完成，请按时完成发布</p>
             </div>
             <ul class="sortable-list connectList agile-list ui-sortable"
                 id="approve_passed">
@@ -72,7 +86,14 @@
                         环境：{{ sheet.env }}<br>
                         服务：{{ sheet.services_str }}<br>
                         TAPD：{{ sheet.tapd_url }}<br>
-                        审批级别：{{ sheet.level }}
+                        审批级别：
+                        {% if sheet.approve_level == '1' %}
+                            <span>{{ sheet.level }}</span>
+                        {% elif sheet.approve_level == '2' %}
+                            <span style="color: #0e9aef">{{ sheet.level }}</span>
+                        {% elif sheet.approve_level == '3' %}
+                            <span style="color: orange">{{ sheet.level }}</span>
+                        {% endif %}
                         <div class="agile-detail">
                             <i class="fa fa-clock-o"></i> {{ sheet.publish_date }} {{ sheet.publish_time }}
                             <a href="javascript:void(0)" class="pull-right btn btn-xs btn-warning">发布</a>
@@ -83,33 +104,4 @@
         </div>
     </div>
 </div>
-<div class="col-lg-3">
-    <div class="ibox">
-        <div class="ibox-content">
-            <div class="text-center">
-                <h3>发布完成</h3>
-                <p class="small"><i class="fa fa-check-square-o"></i> 已完成，请检查是否发布成功</p>
-            </div>
-
-            <ul class="sortable-list connectList agile-list ui-sortable" id="publish_done">
-                {% for sheet in publish_done_list %}
-
-                    <li class="success-element">
-                        项目：{{ sheet.gogroup }}<br>
-                        环境：{{ sheet.env }}<br>
-                        服务：{{ sheet.services_str }}<br>
-                        TAPD：{{ sheet.tapd_url }}<br>
-                        审批级别：{{ sheet.level }}
-                        <div class="agile-detail">
-                            <i class="fa fa-clock-o"></i> {{ sheet.publish_date }} {{ sheet.publish_time }}
-                            <a href="javascript:void(0)" class="pull-right btn btn-xs btn-primary">详情</a>
-                        </div>
-                    </li>
-                {% endfor %}
-
-            </ul>
-        </div>
-    </div>
-</div>
-
 <script src="/static/js/custom/publish_sheet.js"></script>

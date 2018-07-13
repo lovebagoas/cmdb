@@ -116,15 +116,15 @@ def PublishSheetList(request):
     tobe_approved_list = []
     approve_refused_list = []
     approve_passed_list = []
-    publish_done_list = []
     for publish in publishsheets:
         services_objs = publish.goservices.all().order_by('name')
         services_str = ', '.join(services_objs.values_list('name', flat=True))
         env = services_objs[0].get_env_display()
         gogroup = services_objs[0].group.name
-        approve_level = publish.approval_level.get_name_display()
+        level = publish.approval_level.get_name_display()
+        approve_level = publish.approval_level.name
         tmp_dict = utils.serialize_instance(publish)
-        tmp_dict.update({'gogroup': gogroup, 'services_str': services_str, 'env': env, 'level': approve_level})
+        tmp_dict.update({'gogroup': gogroup, 'services_str': services_str, 'env': env, 'approve_level': approve_level, 'level': level})
 
         if publish.status == '1':
             tobe_approved_list.append(tmp_dict)
@@ -133,13 +133,44 @@ def PublishSheetList(request):
         elif publish.status == '3':
             approve_passed_list.append(tmp_dict)
         else:
-            publish_done_list.append(tmp_dict)
+            pass
 
     errcode = 0
     msg = 'ok'
-    data = dict(code=errcode, msg=msg, tobe_approved_list=tobe_approved_list, approve_refused_list=approve_refused_list, approve_passed_list=approve_passed_list, publish_done_list=publish_done_list)
+    data = dict(code=errcode, msg=msg, tobe_approved_list=tobe_approved_list, approve_refused_list=approve_refused_list, approve_passed_list=approve_passed_list)
 
-    return render_to_response('publish/publish_sheet.html', data)
+    return render_to_response('publish/publish_sheets.html', data)
+
+
+@login_required
+def PublishSheetDoneList(request):
+    publishsheets = models.PublishSheet.objects.all().order_by('publish_date', 'publish_time')
+
+    done_list = []
+    outtime_list = []
+    for publish in publishsheets:
+        services_objs = publish.goservices.all().order_by('name')
+        services_str = ', '.join(services_objs.values_list('name', flat=True))
+        env = services_objs[0].get_env_display()
+        gogroup = services_objs[0].group.name
+        level = publish.approval_level.get_name_display()
+        approve_level = publish.approval_level.name
+        tmp_dict = utils.serialize_instance(publish)
+        tmp_dict.update({'gogroup': gogroup, 'services_str': services_str, 'env': env, 'approve_level': approve_level,
+                         'level': level})
+
+        if publish.status == '4':
+            done_list.append(tmp_dict)
+        elif publish.status == '5':
+            outtime_list.append(tmp_dict)
+        else:
+            pass
+
+    errcode = 0
+    msg = 'ok'
+    data = dict(code=errcode, msg=msg, done_list=done_list, outtime_list=outtime_list)
+
+    return render_to_response('publish/publish_done.html', data)
 
 
 @login_required
@@ -156,10 +187,8 @@ def createPublishSheet(request):
     publish_date = request.POST['publish_date']
     if '/' in publish_date:
         publish_date = '-'.join(publish_date.split('/'))
-    print publish_date
 
     publish_time = request.POST['publish_time']
-    print publish_time
 
     try:
         projectinfo_obj = models.ProjectInfo.objects.get(group__name=project_name)
@@ -253,7 +282,7 @@ def ApproveInit(request):
         errcode = 500
         msg = u'发布单不存在'
         data = dict(code=errcode, msg=msg)
-        return render_to_response('publish/publish_sheet.html', data)
+        return render_to_response('publish/publish_sheets.html', data)
     else:
         tmp_dict = utils.serialize_instance(publishsheet)
         errcode = 0
