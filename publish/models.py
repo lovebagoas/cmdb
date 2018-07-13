@@ -103,6 +103,7 @@ class PublishSheet(models.Model):
     status = models.CharField(choices=STATUS, max_length=32, verbose_name=u"发布单状态", default='1')
     project_info = models.ForeignKey(ProjectInfo, blank=True, null=True)
     approval_level = models.ForeignKey(ApprovalLevel, blank=True, null=True)
+    refuse_reason = models.TextField(verbose_name=u"审批拒绝原因", blank=True, null=True)
 
     def __unicode__(self):
         return self.tapd_url

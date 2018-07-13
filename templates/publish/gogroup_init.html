@@ -216,7 +216,7 @@
                                                     <div class="agile-detail">
                                                         <i class="fa fa-clock-o"></i> ...
                                                     </div>
-                                                    <a href="#" class="pull-right btn btn-xs btn-primary"
+                                                    <a href="javascript:void(0)" class="pull-right btn btn-xs btn-primary"
                                                        onclick="sendProjectValue('{{ project.0 }}')">详情</a>
                                                 {% else %}
                                                     {% for level in project.1|slice:"2:" %}
@@ -226,7 +226,7 @@
                                                             ~ {{ level.end_time }}<br>
                                                         </div>
                                                     {% endfor %}
-                                                    <a href="#" class="pull-right btn btn-xs btn-primary"
+                                                    <a href="javascript:void(0)" class="pull-right btn btn-xs btn-primary"
                                                        onclick="sendProjectValue('{{ project.0 }}')">详情</a>
                                                 {% endif %}
                                             </li>

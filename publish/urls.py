@@ -8,4 +8,5 @@ urlpatterns = patterns('',
                        url(r'^publishsheet/create/$', createPublishSheet, name='createPublishSheet'),
                        url(r'^publishsheet/list/$', PublishSheetList, name='PublishSheetList'),
                        url(r'^approve/list/$', ApproveList, name='ApproveList'),
+                       url(r'^approve/init/$', ApproveInit, name='ApproveInit'),
                        )

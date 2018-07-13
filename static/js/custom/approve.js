@@ -49,4 +49,23 @@ $("#approveList").click(function () {
 
 });
 
-
+function approveSheet(sheet_id) {
+    let url = '/asset/approve/init/?sheet_id=' + sheet_id;
+    $.ajax({
+        url: url,
+        type: "GET",
+        beforeSend: function () {
+            $("#page_loading").show();
+        },
+        success: function (result) {
+            if (result.length > 0) {
+                $("#tab-2").html(result);
+            }
+            $("#page_loading").hide();
+        },
+        error: function () {
+            alert('失败');
+            $("#page_loading").hide();
+        }
+    });
+}

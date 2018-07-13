@@ -27,45 +27,26 @@
                                     <div class="text-center">
                                         <h3>待审批
                                         </h3>
-                                        <p class="small"><i class="fa fa-clock-o"></i> 请在发布时间前审批</p>
+                                        <p class="small"><i class="fa fa-clock-o"></i> 请在发布时间之前审批</p>
                                     </div>
 
-                                    <ul class="sortable-list connectList agile-list ui-sortable" id="todo">
-                                        <li class="info-element">
-                                            www.dfjsal.com
-                                            <div class="agile-detail">
-                                                <a href="#" class="pull-right btn btn-xs btn-success">审批</a>
-                                                <i class="fa fa-clock-o"></i> 2018-07-24 12:00
-                                            </div>
-                                        </li>
-                                        <li class="info-element">
-                                            www.dfjsal.com
-                                            <div class="agile-detail">
-                                                <a href="#" class="pull-right btn btn-xs btn-success">审批</a>
-                                                <i class="fa fa-clock-o"></i> 2018-07-24 12:00
-                                            </div>
-                                        </li>
-                                        <li class="info-element">
-                                            www.dfjsal.com
-                                            <div class="agile-detail">
-                                                <a href="#" class="pull-right btn btn-xs btn-success">审批</a>
-                                                <i class="fa fa-clock-o"></i> 2018-07-24 12:00
-                                            </div>
-                                        </li>
-                                        <li class="info-element">
-                                            www.dfjsal.com
-                                            <div class="agile-detail">
-                                                <a href="#" class="pull-right btn btn-xs btn-success">审批</a>
-                                                <i class="fa fa-clock-o"></i> 2018-07-24 12:00
-                                            </div>
-                                        </li>
-                                        <li class="info-element">
-                                            www.dfjsal.com
-                                            <div class="agile-detail">
-                                                <a href="#" class="pull-right btn btn-xs btn-success">审批</a>
-                                                <i class="fa fa-clock-o"></i> 2018-07-24 12:00
-                                            </div>
-                                        </li>
+                                    <ul class="sortable-list connectList agile-list ui-sortable" id="to_be_approved">
+
+                                        {% for sheet in tobe_approved_list %}
+                                            <li class="info-element">
+                                                项目：{{ sheet.gogroup }}<br>
+                                                环境：{{ sheet.env }}<br>
+                                                服务：{{ sheet.services_str }}<br>
+                                                TAPD：{{ sheet.tapd_url }}<br>
+                                                审批级别：{{ sheet.level }}
+
+                                                <div class="agile-detail">
+                                                    <i class="fa fa-clock-o"></i> {{ sheet.publish_date }} {{ sheet.publish_time }}
+                                                    <a href="javascript:void(0)" class="pull-right btn btn-xs btn-success" onclick="approveSheet('{{ sheet.id }}')">审批</a>
+                                                </div>
+                                            </li>
+                                        {% endfor %}
+
                                     </ul>
                                 </div>
                             </div>
@@ -75,38 +56,24 @@
                                 <div class="ibox-content">
                                     <div class="text-center">
                                         <h3>审批拒绝</h3>
-                                        <p class="small" style="color: darkorange"><i class="fa fa-warning"></i> 不通过</p>
+                                        <p class="small" style="color: darkorange"><i class="fa fa-warning"></i> 审批不通过
+                                        </p>
                                     </div>
                                     <ul class="sortable-list connectList agile-list ui-sortable"
-                                        id="inprogress">
-                                        <li class="warning-element">
-                                            www.dfjsal.com
-                                            <div class="agile-detail">
-                                                <a href="#" class="pull-right btn btn-xs btn-warning">查看</a>
-                                                <i class="fa fa-clock-o"></i> 2018-07-24 12:00
-                                            </div>
-                                        </li>
-                                        <li class="warning-element">
-                                            www.dfjsal.com
-                                            <div class="agile-detail">
-                                                <a href="#" class="pull-right btn btn-xs btn-warning">查看</a>
-                                                <i class="fa fa-clock-o"></i> 2018-07-24 12:00
-                                            </div>
-                                        </li>
-                                        <li class="warning-element">
-                                            www.dfjsal.com
-                                            <div class="agile-detail">
-                                                <a href="#" class="pull-right btn btn-xs btn-warning">查看</a>
-                                                <i class="fa fa-clock-o"></i> 2018-07-24 12:00
-                                            </div>
-                                        </li>
-                                        <li class="warning-element">
-                                            www.dfjsal.com
-                                            <div class="agile-detail">
-                                                <a href="#" class="pull-right btn btn-xs btn-warning">查看</a>
-                                                <i class="fa fa-clock-o"></i> 2018-07-24 12:00
-                                            </div>
-                                        </li>
+                                        id="approve_refused">
+                                        {% for sheet in approve_refused_list %}
+                                            <li class="danger-element">
+                                                项目：{{ sheet.gogroup }}<br>
+                                                环境：{{ sheet.env }}<br>
+                                                服务：{{ sheet.services_str }}<br>
+                                                TAPD：{{ sheet.tapd_url }}<br>
+                                                审批级别：{{ sheet.level }}
+                                                <div class="agile-detail">
+                                                    <i class="fa fa-clock-o"></i> {{ sheet.publish_date }} {{ sheet.publish_time }}
+                                                    <a href="javascript:void(0)" class="pull-right btn btn-xs btn-danger">查看</a>
+                                                </div>
+                                            </li>
+                                        {% endfor %}
                                     </ul>
                                 </div>
                             </div>
@@ -119,21 +86,20 @@
                                         <p class="small"><i class="fa fa-check-square-o"></i> 审批通过，待发布</p>
                                     </div>
 
-                                    <ul class="sortable-list connectList agile-list ui-sortable" id="completed">
-                                        <li class="success-element">
-                                            www.dfjsal.com
-                                            <div class="agile-detail">
-                                                <a href="#" class="pull-right btn btn-xs btn-default">查看</a>
-                                                <i class="fa fa-clock-o"></i> 2018-07-24 12:00
-                                            </div>
-                                        </li>
-                                        <li class="success-element">
-                                            www.dfjsal.com
-                                            <div class="agile-detail">
-                                                <a href="#" class="pull-right btn btn-xs btn-default">查看</a>
-                                                <i class="fa fa-clock-o"></i> 2018-07-24 12:00
-                                            </div>
-                                        </li>
+                                    <ul class="sortable-list connectList agile-list ui-sortable" id="approve_passed">
+                                        {% for sheet in approve_passed_list %}
+                                            <li class="success-element">
+                                                项目：{{ sheet.gogroup }}<br>
+                                                环境：{{ sheet.env }}<br>
+                                                服务：{{ sheet.services_str }}<br>
+                                                TAPD：{{ sheet.tapd_url }}<br>
+                                                审批级别：{{ sheet.level }}
+                                                <div class="agile-detail">
+                                                    <i class="fa fa-clock-o"></i> {{ sheet.publish_date }} {{ sheet.publish_time }}
+                                                    <a href="javascript:void(0)" class="pull-right btn btn-xs btn-primary">查看</a>
+                                                </div>
+                                            </li>
+                                        {% endfor %}
                                     </ul>
                                 </div>
                             </div>

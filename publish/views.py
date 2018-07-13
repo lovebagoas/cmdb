@@ -194,12 +194,9 @@ def createPublishSheet(request):
                     end_time_int = time.mktime(end_time_format)
                     if start_time_int < publish_time_int < end_time_int:
                         publishsheet_obj.approval_level = time_obj.approval_level
-                        print 'publishsheet_obj.approval_level : '
-                        print time_obj.approval_level.get_name_display()
                         slot = True
                         break
         if not slot:
-            print 'createPublishSheet---slot not'
             publishsheet_obj.approval_level = models.ApprovalLevel.objects.get(name='1')
 
         if sql:
@@ -220,9 +217,47 @@ def createPublishSheet(request):
 @login_required
 def ApproveList(request):
     user = request.user
-    publishsheet_objs = models.PublishSheet.objects.all().order_by('status')
+    publishsheets = models.PublishSheet.objects.all().order_by('publish_date', 'publish_time')
 
-    return render(request, 'publish/approve.html',
-                  {'publishsheet_objs': publishsheet_objs})
+    tobe_approved_list = []
+    approve_refused_list = []
+    approve_passed_list = []
+    for publish in publishsheets:
+        services_objs = publish.goservices.all().order_by('name')
+        services_str = ', '.join(services_objs.values_list('name', flat=True))
+        env = services_objs[0].get_env_display()
+        gogroup = services_objs[0].group.name
+        approve_level = publish.approval_level.get_name_display()
+        tmp_dict = utils.serialize_instance(publish)
+        tmp_dict.update({'gogroup': gogroup, 'services_str': services_str, 'env': env, 'level': approve_level})
+
+        if publish.status == '1':
+            tobe_approved_list.append(tmp_dict)
+        elif publish.status == '2':
+            approve_refused_list.append(tmp_dict)
+        else:
+            approve_passed_list.append(tmp_dict)
+
+    return render(request, 'publish/approve_list.html',
+                  {'tobe_approved_list': tobe_approved_list, 'approve_refused_list': approve_refused_list, 'approve_passed_list': approve_passed_list})
 
 
+@login_required
+def ApproveInit(request):
+    user = request.user
+    sheet_id = request.GET['sheet_id']
+    print sheet_id
+    try:
+        publishsheet = models.PublishSheet.objects.get(id=sheet_id)
+    except models.PublishSheet.DoesNotExist:
+        errcode = 500
+        msg = u'发布单不存在'
+        data = dict(code=errcode, msg=msg)
+        return render_to_response('publish/publish_sheet.html', data)
+    else:
+        tmp_dict = utils.serialize_instance(publishsheet)
+        errcode = 0
+        msg = 'ok'
+        data = dict(code=errcode, msg=msg, approve_sheet=tmp_dict)
+
+        return render_to_response('publish/approve_sheet.html', data)
