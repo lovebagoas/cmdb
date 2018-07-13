@@ -117,23 +117,31 @@ def PublishSheetList(request):
     approve_refused_list = []
     approve_passed_list = []
     for publish in publishsheets:
-        services_objs = publish.goservices.all().order_by('name')
-        services_str = ', '.join(services_objs.values_list('name', flat=True))
-        env = services_objs[0].get_env_display()
-        gogroup = services_objs[0].group.name
-        level = publish.approval_level.get_name_display()
-        approve_level = publish.approval_level.name
-        tmp_dict = utils.serialize_instance(publish)
-        tmp_dict.update({'gogroup': gogroup, 'services_str': services_str, 'env': env, 'approve_level': approve_level, 'level': level})
-
-        if publish.status == '1':
-            tobe_approved_list.append(tmp_dict)
-        elif publish.status == '2':
-            approve_refused_list.append(tmp_dict)
-        elif publish.status == '3':
-            approve_passed_list.append(tmp_dict)
+        publish_datetime_str = publish.publish_date + ' ' + publish.publish_time
+        publish_datetime_format = time.strptime(publish_datetime_str, '%Y-%m-%d %H:%M')
+        publish_datetime_int = time.mktime(publish_datetime_format)
+        now_int = time.time()
+        if publish_datetime_int < now_int and (publish.status == '1' or publish.status == '3'):
+            publish.status = '5'
+            publish.save()
         else:
-            pass
+            services_objs = publish.goservices.all().order_by('name')
+            services_str = ', '.join(services_objs.values_list('name', flat=True))
+            env = services_objs[0].get_env_display()
+            gogroup = services_objs[0].group.name
+            level = publish.approval_level.get_name_display()
+            approve_level = publish.approval_level.name
+            tmp_dict = utils.serialize_instance(publish)
+            tmp_dict.update({'gogroup': gogroup, 'services_str': services_str, 'env': env, 'approve_level': approve_level, 'level': level})
+
+            if publish.status == '1':
+                tobe_approved_list.append(tmp_dict)
+            elif publish.status == '2':
+                approve_refused_list.append(tmp_dict)
+            elif publish.status == '3':
+                approve_passed_list.append(tmp_dict)
+            else:
+                pass
 
     errcode = 0
     msg = 'ok'
