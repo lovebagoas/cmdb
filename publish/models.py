@@ -89,8 +89,9 @@ class Festival(models.Model):
 class PublishSheet(models.Model):
     STATUS = (
         ('1', u'审批中'),
-        ('2', u'完成审批'),
-        ('3', u'完成发布'),
+        ('2', u'审批拒绝'),
+        ('3', u'审批通过'),
+        ('4', u'完成发布'),
     )
     creator = models.ForeignKey(User, verbose_name=u"创建者", related_name="creator_of_publishsheet", default=1)
     goservices = models.ManyToManyField(goservices, verbose_name=u'重启服务', related_name='publish_goservices')
@@ -100,6 +101,8 @@ class PublishSheet(models.Model):
     sql = models.TextField(verbose_name=u"执行SQL", blank=True, null=True)
     consul_key = models.CharField(max_length=100, verbose_name=u"consul key", blank=True, null=True)
     status = models.CharField(choices=STATUS, max_length=32, verbose_name=u"发布单状态", default='1')
+    project_info = models.ForeignKey(ProjectInfo, blank=True, null=True)
+    approval_level = models.ForeignKey(ApprovalLevel, blank=True, null=True)
 
     def __unicode__(self):
         return self.tapd_url

@@ -14,10 +14,11 @@
 {% block content %}
     <div class="tabs-container">
         <ul class="nav nav-tabs">
-            <li id="publishSheet" class="active"><a data-toggle="tab" href="#tab-2">审批发布单</a></li>
+            <li id="approveList" class="active"><a data-toggle="tab" href="#tab-1">审批发布单</a></li>
+            <li id="approveDetail" class="" style="display: none"><a data-toggle="tab" href="#tab-2">审批</a></li>
         </ul>
         <div class="tab-content">
-            <div id="tab-2" class="tab-pane active">
+            <div id="tab-1" class="tab-pane active">
                 <div class="wrapper wrapper-content animated fadeInRight">
                     <div class="row">
                         <div class="col-lg-4">
@@ -142,6 +143,110 @@
                 </div>
             </div>
 
+            <div id="tab-2" class="tab-pane">
+                <div class="wrapper wrapper-content animated fadeInRight">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="ibox">
+                                <div class="ibox-content">
+                                    <form role="form" id="publish_form">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <div class="form-group">
+                                                    <span style="color: red;">*</span><label>&nbsp;项目</label>
+                                                    <select class="form-control" id="project_name">
+                                                        {% for gogroup in gogroup_objs %}
+                                                            <option value={{ gogroup.name }}>{{ gogroup.name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="form-group">
+                                                    <span style="color: red;">*</span><label>&nbsp;环境</label>
+                                                    <select class="form-control" id="env_id">
+                                                        <option value='1' selected>生产环境</option>
+                                                        <option value='2'>测试环境</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <div class="form-group">
+                                                    <span style="color: red;">*</span><label>&nbsp;TAPD URL</label>
+                                                    <input type="text" class="form-control" id="tapd_url">
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="form-group">
+                                                    <span style="color: red;">*</span><label>&nbsp;重启服务</label>
+                                                    <select id="reboot_services_choice" multiple="multiple"
+                                                            class="form-control" data-live-search="true">
+
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <div class="form-group">
+                                                    <label>&nbsp;SQL (若有SQL需要执行，请让DBA执行后再发布)</label>
+                                                    <textarea type="text" class="form-control" id="sql"
+                                                              rows="5"></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="form-group">
+                                                    <label>&nbsp;CONSUL KEY (若有consul key添加或修改，请让运维操作后再发布)</label>
+                                                    <textarea type="text" class="form-control" id="consul_key"
+                                                              rows="5"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <div class="form-group">
+                                                    <span style="color: red;">*</span><label>发布日期</label>
+                                                    <div class="input-group date" data-provide="datepicker">
+                                                        <input type="text" id="datepicker" class="form-control">
+                                                        <div class="input-group-addon">
+                                                            <span class="glyphicon glyphicon-th"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="form-group">
+                                                    <span style="color: red;">*</span><label>开始发布时间</label>
+                                                    <div class="input-group bootstrap-timepicker timepicker">
+                                                        <input type="text"
+                                                               class="form-control timepicker" id="publish_time">
+                                                        <span class="input-group-addon"><i
+                                                                class="glyphicon glyphicon-time"></i></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <br>
+                                        <div class="text-center">
+                                            <button class="btn btn-sm btn-primary m-t-n-xs" type="submit"
+                                                    id="create">保存
+                                            </button>
+                                        </div>
+                                    </form>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <script src="/static/js/custom/approve.js"></script>

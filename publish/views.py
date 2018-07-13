@@ -1,7 +1,9 @@
 # coding:utf8
 import json
+from datetime import datetime
+import time
 
-from django.shortcuts import render, HttpResponse
+from django.shortcuts import render, HttpResponse, render_to_response
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 
@@ -109,50 +111,110 @@ def createProject(request):
 
 @login_required
 def PublishSheetList(request):
-    publishsheet_objs = models.PublishSheet.objects.all().order_by('status')
-    publishsheet_list = utils.serialize_queryset(publishsheet_objs)
-    print 'publishsheet_list : '
-    print publishsheet_list
+    publishsheets = models.PublishSheet.objects.all().order_by('publish_date', 'publish_time')
+
+    tobe_approved_list = []
+    approve_refused_list = []
+    approve_passed_list = []
+    publish_done_list = []
+    for publish in publishsheets:
+        services_objs = publish.goservices.all().order_by('name')
+        services_str = ', '.join(services_objs.values_list('name', flat=True))
+        env = services_objs[0].get_env_display()
+        gogroup = services_objs[0].group.name
+        approve_level = publish.approval_level.get_name_display()
+        tmp_dict = utils.serialize_instance(publish)
+        tmp_dict.update({'gogroup': gogroup, 'services_str': services_str, 'env': env, 'level': approve_level})
+
+        if publish.status == '1':
+            tobe_approved_list.append(tmp_dict)
+        elif publish.status == '2':
+            approve_refused_list.append(tmp_dict)
+        elif publish.status == '3':
+            approve_passed_list.append(tmp_dict)
+        else:
+            publish_done_list.append(tmp_dict)
 
     errcode = 0
     msg = 'ok'
-    data = dict(code=errcode, msg=msg, content=publishsheet_list)
-    return HttpResponse(json.dumps(data), content_type='application/json')
+    data = dict(code=errcode, msg=msg, tobe_approved_list=tobe_approved_list, approve_refused_list=approve_refused_list, approve_passed_list=approve_passed_list, publish_done_list=publish_done_list)
+
+    return render_to_response('publish/publish_sheet.html', data)
 
 
 @login_required
 def createPublishSheet(request):
+    errcode = 0
+    msg = 'ok'
     user = request.user
+    project_name = request.POST['project_name']
     env_id = request.POST['env_id']
     tapd_url = request.POST['tapd_url']
     reboot_services_list = request.POST.getlist('reboot_services_list', [])
-    publish_date = request.POST['publish_date']
-    publish_time = request.POST['publish_time']
     sql = request.POST['sql']
     consul_key = request.POST['consul_key']
+    publish_date = request.POST['publish_date']
+    if '/' in publish_date:
+        publish_date = '-'.join(publish_date.split('/'))
+    print publish_date
 
-    errcode = 0
-    msg = 'ok'
+    publish_time = request.POST['publish_time']
+    print publish_time
 
-    goservices_objs = asset_models.goservices.objects.filter(env=env_id).filter(name__in=reboot_services_list)
-    publishsheet_obj = models.PublishSheet()
-    publishsheet_obj.creator = user
-    publishsheet_obj.tapd_url = tapd_url
-    publishsheet_obj.publish_date = publish_date
-    publishsheet_obj.publish_time = publish_time
-    if sql:
-        publishsheet_obj.sql = sql
+    try:
+        projectinfo_obj = models.ProjectInfo.objects.get(group__name=project_name)
+    except models.ProjectInfo.DoesNotExist:
+        errcode = 500
+        msg = u'项目初始化信息不存在'
+        data = dict(code=errcode, msg=msg)
+        return HttpResponse(json.dumps(data), content_type='application/json')
+    else:
+        goservices_objs = asset_models.goservices.objects.filter(env=env_id).filter(name__in=reboot_services_list)
+        publishsheet_obj = models.PublishSheet()
+        publishsheet_obj.creator = user
+        publishsheet_obj.tapd_url = tapd_url
+        publishsheet_obj.publish_date = publish_date
+        publishsheet_obj.publish_time = publish_time
+        publishsheet_obj.project_info = projectinfo_obj
 
-    if consul_key:
-        publishsheet_obj.consul_key = consul_key
+        publish_week = datetime.strptime(publish_date, '%Y-%m-%d').isoweekday()
 
-    publishsheet_obj.save()
+        timeslot_objs = models.TimeSlot.objects.filter(project_info=projectinfo_obj)
+        slot = False
+        if len(timeslot_objs) > 0:
+            for time_obj in timeslot_objs:
+                start_week_int = int(time_obj.start_of_week)
+                end_week_int = int(time_obj.end_of_week)
+                if start_week_int < publish_week < end_week_int:
+                    publish_time_format = time.strptime(str(publish_date) + ' ' + str(publish_time), '%Y-%m-%d %H:%M')
+                    start_time_format = time.strptime(str(publish_date) + ' ' + str(time_obj.start_time), '%Y-%m-%d %H:%M')
+                    end_time_format = time.strptime(str(publish_date) + ' ' + str(time_obj.end_time), '%Y-%m-%d %H:%M')
+                    publish_time_int = time.mktime(publish_time_format)
+                    start_time_int = time.mktime(start_time_format)
+                    end_time_int = time.mktime(end_time_format)
+                    if start_time_int < publish_time_int < end_time_int:
+                        publishsheet_obj.approval_level = time_obj.approval_level
+                        print 'publishsheet_obj.approval_level : '
+                        print time_obj.approval_level.get_name_display()
+                        slot = True
+                        break
+        if not slot:
+            print 'createPublishSheet---slot not'
+            publishsheet_obj.approval_level = models.ApprovalLevel.objects.get(name='1')
 
-    for goservice in goservices_objs:
-        publishsheet_obj.goservices.add(goservice)
+        if sql:
+            publishsheet_obj.sql = sql
 
-    data = dict(code=errcode, msg=msg)
-    return HttpResponse(json.dumps(data), content_type='application/json')
+        if consul_key:
+            publishsheet_obj.consul_key = consul_key
+
+        publishsheet_obj.save()
+
+        for goservice in goservices_objs:
+            publishsheet_obj.goservices.add(goservice)
+
+        data = dict(code=errcode, msg=msg)
+        return HttpResponse(json.dumps(data), content_type='application/json')
 
 
 @login_required
