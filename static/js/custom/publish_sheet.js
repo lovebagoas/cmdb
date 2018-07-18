@@ -1,4 +1,3 @@
-
 function get_reboot_services(project_name, env_id) {
     $('#reboot_services_choice').val(null).trigger('change');
     $('#reboot_services_choice').on("removed", function () {
@@ -17,6 +16,7 @@ function get_reboot_services(project_name, env_id) {
 
 
 function init_tab3() {
+    let project_name = $('#project_name').val();
     $('#datepicker').parent().datepicker({
         autoclose: true,
         todayHighlight: true,
@@ -61,7 +61,6 @@ function init_tab3() {
         placeholder: '请选择',
     });
 
-    let project_name = $('#project_name').val();
     let env_id = $('#env_id').val();
     get_reboot_services(project_name, env_id);
 }
@@ -75,3 +74,50 @@ $('#createPublish').click(function () {
     $("#tab-3").addClass("active");
     init_tab3();
 });
+
+function delete_publishsheet(sheet_id) {
+    let url = '/asset/publishsheet/delete/';
+    let data = {
+        'sheet_id': sheet_id,
+    };
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: data,
+        contentType: 'application/x-www-form-urlencoded',
+        traditional: true,
+        beforeSend: function () {
+            // 禁用按钮防止重复提交
+            $("#page_loading").show();
+        },
+        success: function (result) {
+            if (result.code === 0) {
+                $("#" + sheet_id).remove();
+            }
+            else {
+                alert(result.msg);
+            }
+            $("#page_loading").hide();
+        },
+        error: function () {
+            alert('失败');
+            $("#page_loading").hide();
+        }
+    });
+}
+
+function sheetRefuseReasonDetail(sheet_id) {
+    let url = '/asset/publishsheet/reason/?sheet_id=' + sheet_id;
+    $.ajax({
+        url: url,
+        type: "GET",
+        success: function (result) {
+            if (result.length > 0) {
+                $("#refuse_reason_modal").html(result);
+            }
+        },
+        error: function () {
+            alert('失败');
+        }
+    });
+}

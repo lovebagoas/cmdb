@@ -1,0 +1,27 @@
+<form class="form-horizontal">
+    <div class="form-group">
+        <label class="col-lg-2 control-label" id="crontab_modify">审批次数</label>
+        <div class="col-lg-10">
+            <input type="text" class="form-control" id="level_type" readonly value="第{{ content.approve_count }}次审批">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label" id="crontab_modify">审批人</label>
+        <div class="col-lg-10">
+            <input type="text" class="form-control" id="level_type" readonly value="{{ content.approver }}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">审批时间</label>
+        <div class="col-lg-10">
+            <input type="text" class="form-control" id="time" readonly
+                   value="{{ content.approve_time|date:'Y-m-d H:i' }}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">拒绝原因</label>
+        <div class="col-lg-10">
+            <textarea class="form-control" readonly rows="5">{{ content.refuse_reason }}</textarea>
+        </div>
+    </div>
+</form>

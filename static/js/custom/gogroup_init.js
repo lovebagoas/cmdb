@@ -149,12 +149,13 @@ $("#create_publishsheet").click(function () {
     let reboot_services_list = $('#reboot_services_choice').val();
     let publish_date = $('#datepicker').datepicker('getData').val();
     let publish_time = $('#publish_time').val();
-    if (!project_name || !env_id || !reboot_services_list || !publish_date || !publish_time || !tapd_url) {
+    let sql = $('#sql').val();
+    let consul_key = $('#consul_key').val();
+
+    if (!project_name || !env_id || !reboot_services_list || !publish_date || !publish_time || !tapd_url || !sql || !consul_key) {
         alert('必填内容不能为空');
         return false;
     }
-    let sql = $('#sql').val();
-    let consul_key = $('#consul_key').val();
 
     let url = '/asset/publishsheet/create/';
     let data = {
@@ -181,22 +182,7 @@ $("#create_publishsheet").click(function () {
         },
         success: function (result) {
             if (result.code === 0) {
-                document.getElementById('createTab').style.display = 'none';
-                document.getElementById('doneSheet').style.display = 'none';
-                document.getElementById('initTemplate').style.display = 'none';
-                $("#projectInfo").removeClass("active");
-                $("#tab-1").removeClass("active");
-                $("#createTab").removeClass("active");
-                $("#tab-3").removeClass("active");
-                $("#publishSheet").addClass("active");
-                $("#tab-2").addClass("active");
-                $("#doneSheet").removeClass("active");
-                $("#tab-4").removeClass("active");
-                init_tab2();
-                $("#initTemplate").removeClass("active");
-                $("#tab-5").removeClass("active");
-                $("#approvalLevelList").removeClass("active");
-                $("#tab-6").removeClass("active");
+                window.location.reload();
             }
             else {
                 alert(result.msg);

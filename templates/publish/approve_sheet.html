@@ -8,20 +8,13 @@
                             <div class="col-lg-6">
                                 <div class="form-group">
                                     <span style="color: red;">*</span><label>&nbsp;发布项目</label>
-                                    <select class="form-control" id="project_name">
-                                        {% for projectinfo in project_tuple %}
-                                            <option value={{ projectinfo.0 }}>{{ projectinfo.0 }}</option>
-                                        {% endfor %}
-                                    </select>
+                                    <input type="text" class="form-control" value="{{ approve_sheet.group_name }}" readonly>
                                 </div>
                             </div>
                             <div class="col-lg-6">
                                 <div class="form-group">
                                     <span style="color: red;">*</span><label>&nbsp;环境</label>
-                                    <select class="form-control" id="env_id">
-                                        <option value='1' selected>生产环境</option>
-                                        <option value='2'>测试环境</option>
-                                    </select>
+                                    <input type="text" class="form-control" value="{{ approve_sheet.env }}" readonly>
                                 </div>
                             </div>
                         </div>
@@ -30,16 +23,13 @@
                             <div class="col-lg-6">
                                 <div class="form-group">
                                     <span style="color: red;">*</span><label>&nbsp;TAPD URL</label>
-                                    <input type="text" class="form-control" id="tapd_url">
+                                    <input type="text" class="form-control" value="{{ approve_sheet.tapd_url }}" readonly>
                                 </div>
                             </div>
                             <div class="col-lg-6">
                                 <div class="form-group">
-                                    <span style="color: red;">*</span><label>&nbsp;重启服务</label>
-                                    <select id="reboot_services_choice" multiple="multiple"
-                                            class="form-control" data-live-search="true">
-
-                                    </select>
+                                    <span style="color: red;">*</span><label>&nbsp;重启服务 (最多选4个)</label>
+                                    <input type="text" class="form-control" value="{{ approve_sheet.services }}" readonly>
                                 </div>
                             </div>
                         </div>
@@ -47,16 +37,17 @@
                         <div class="row">
                             <div class="col-lg-6">
                                 <div class="form-group">
-                                    <label>&nbsp;SQL (若有SQL需要执行，请让DBA执行后再发布)</label>
+                                    <span style="color: red;">*</span><label>&nbsp;SQL (若有SQL需要执行，请让DBA执行后再发布)</label>
                                     <textarea type="text" class="form-control" id="sql"
-                                              rows="5"></textarea>
+                                              rows="5" readonly>{{ approve_sheet.sql }}</textarea>
                                 </div>
                             </div>
                             <div class="col-lg-6">
                                 <div class="form-group">
-                                    <label>&nbsp;CONSUL KEY (若有consul key添加或修改，请让运维操作后再发布)</label>
+                                    <span style="color: red;">*</span><label>&nbsp;CONSUL KEY (若有consul
+                                    key添加或修改，请让运维操作后再发布)</label>
                                     <textarea type="text" class="form-control" id="consul_key"
-                                              rows="5"></textarea>
+                                              rows="5" readonly>{{ approve_sheet.consul_key }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -65,24 +56,14 @@
                         <div class="row">
                             <div class="col-lg-6">
                                 <div class="form-group">
-                                    <span style="color: red;">*</span><label>发布日期</label>
-                                    <div class="input-group date" data-provide="datepicker">
-                                        <input type="text" id="datepicker" class="form-control">
-                                        <div class="input-group-addon">
-                                            <span class="glyphicon glyphicon-th"></span>
-                                        </div>
-                                    </div>
+                                    <span style="color: red;">*</span><label>&nbsp;发布日期</label>
+                                    <input type="text" class="form-control" value="{{ approve_sheet.publish_date }}" readonly>
                                 </div>
                             </div>
                             <div class="col-lg-6">
                                 <div class="form-group">
-                                    <span style="color: red;">*</span><label>开始发布时间</label>
-                                    <div class="input-group bootstrap-timepicker timepicker">
-                                        <input type="text"
-                                               class="form-control timepicker" id="publish_time">
-                                        <span class="input-group-addon"><i
-                                                class="glyphicon glyphicon-time"></i></span>
-                                    </div>
+                                    <span style="color: red;">*</span><label>&nbsp;开始发布时间</label>
+                                    <input type="text" class="form-control" value="{{ approve_sheet.publish_time }}" readonly>
                                 </div>
                             </div>
                         </div>
@@ -90,7 +71,10 @@
                         <br>
                         <div class="text-center">
                             <button class="btn btn-sm btn-primary m-t-n-xs" type="submit"
-                                    id="create_publishsheet">保存
+                                    id="approve_agree">同意
+                            </button>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <button class="btn btn-sm btn-danger m-t-n-xs" type="submit"
+                                    id="approve_refuse">拒绝
                             </button>
                         </div>
                     </form>

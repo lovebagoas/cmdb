@@ -34,15 +34,31 @@
 
                                         {% for sheet in tobe_approved_list %}
                                             <li class="info-element">
+                                                <i class="fa fa-clock-o"></i> {{ sheet.publish_date }} {{ sheet.publish_time }}<br>
+                                                创建人：{{ sheet.creator }}<br>
                                                 项目：{{ sheet.gogroup }}<br>
                                                 环境：{{ sheet.env }}<br>
                                                 服务：{{ sheet.services_str }}<br>
+
+                                                {% if sheet.approve_level == '1' %}
+                                                    审批级别：<span>{{ sheet.level }}</span><br>
+                                                {% elif sheet.approve_level == '2' %}
+                                                    审批级别：<span style="color: #0e9aef">{{ sheet.level }}</span><br>
+                                                    一级审批人：<span>{{ sheet.first_str }}</span><br>
+                                                {% elif sheet.approve_level == '3' %}
+                                                    审批级别：<span style="color: orange">{{ sheet.level }}</span><br>
+                                                    一级审批人：<span>{{ sheet.first_str }}</span><br>
+                                                    二级审批人：<span>{{ sheet.second_str }}</span><br>
+                                                {% endif %}
+
                                                 TAPD：{{ sheet.tapd_url }}<br>
-                                                审批级别：{{ sheet.level }}
+                                                SQL：{{ sheet.sql }}<br>
+                                                CONSUL KEY：{{ sheet.consul_key }}
 
                                                 <div class="agile-detail">
-                                                    <i class="fa fa-clock-o"></i> {{ sheet.publish_date }} {{ sheet.publish_time }}
-                                                    <a href="javascript:void(0)" class="pull-right btn btn-xs btn-success" onclick="approveSheet('{{ sheet.id }}')">审批</a>
+                                                    <a href="javascript:void(0)"
+                                                       class="pull-right btn btn-xs btn-success"
+                                                       onclick="approveSheet('{{ sheet.id }}')">审批</a>
                                                 </div>
                                             </li>
                                         {% endfor %}
@@ -69,9 +85,11 @@
                                                 TAPD：{{ sheet.tapd_url }}<br>
                                                 审批级别：{{ sheet.level }}
                                                 <div class="agile-detail">
-                                                    <i class="fa fa-clock-o"></i> {{ sheet.publish_date }} {{ sheet.publish_time }}
-                                                    <a href="javascript:void(0)" class="pull-right btn btn-xs btn-danger">查看</a>
+                                                    <a data-toggle="modal" data-target="#sheetRefuseReasonModal"
+                                                       class="pull-right btn btn-xs btn-danger"
+                                                       onclick="approveRefuseReasonDetail('{{ sheet.id }}')">原因</a>
                                                 </div>
+
                                             </li>
                                         {% endfor %}
                                     </ul>
@@ -94,10 +112,7 @@
                                                 服务：{{ sheet.services_str }}<br>
                                                 TAPD：{{ sheet.tapd_url }}<br>
                                                 审批级别：{{ sheet.level }}
-                                                <div class="agile-detail">
-                                                    <i class="fa fa-clock-o"></i> {{ sheet.publish_date }} {{ sheet.publish_time }}
-                                                    <a href="javascript:void(0)" class="pull-right btn btn-xs btn-primary">查看</a>
-                                                </div>
+
                                             </li>
                                         {% endfor %}
                                     </ul>
@@ -215,6 +230,30 @@
             </div>
         </div>
     </div>
-    <script src="/static/js/custom/approve.js"></script>
+
+    <div class="modal inmodal fade" id="sheetRefuseReasonModal" tabindex="-1" role="dialog"
+         aria-labelledby="addModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content animated fadeIn">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span
+                            aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                    <i class="fa fa-times modal-icon"></i>
+                    <h4 class="modal-title" id="minion_old">拒绝原因</h4>
+                </div>
+                <div class="modal-body" id="refuse_reason_modal">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+                    {#                <button type="button" class="btn btn-primary" id="modifyCrontabButton">保存#}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/custom/approve_list.js"></script>
 
 {% endblock %}

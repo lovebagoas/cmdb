@@ -69,3 +69,19 @@ function approveSheet(sheet_id) {
         }
     });
 }
+
+function approveRefuseReasonDetail(sheet_id) {
+    let url = '/asset/publishsheet/reason/?sheet_id=' + sheet_id;
+    $.ajax({
+        url: url,
+        type: "GET",
+        success: function (result) {
+            if (result.length > 0) {
+                $("#refuse_reason_modal").html(result);
+            }
+        },
+        error: function () {
+            alert('失败');
+        }
+    });
+}

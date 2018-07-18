@@ -1,4 +1,3 @@
-
 <div class="col-lg-4">
     <div class="ibox">
         <div class="ibox-content">
@@ -9,24 +8,27 @@
 
             <ul class="sortable-list connectList agile-list ui-sortable" id="publish_done">
                 {% for sheet in done_list %}
-
                     <li class="success-element">
+                        <i class="fa fa-clock-o"></i> {{ sheet.publish_date }} {{ sheet.publish_time }}<br>
+                        创建人：{{ sheet.creator }}<br>
                         项目：{{ sheet.gogroup }}<br>
                         环境：{{ sheet.env }}<br>
                         服务：{{ sheet.services_str }}<br>
-                        TAPD：{{ sheet.tapd_url }}<br>
-                        审批级别：
+
                         {% if sheet.approve_level == '1' %}
-                            <span>{{ sheet.level }}</span>
+                            审批级别：<span>{{ sheet.level }}</span><br>
                         {% elif sheet.approve_level == '2' %}
-                            <span style="color: #0e9aef">{{ sheet.level }}</span>
+                            审批级别：<span style="color: #0e9aef">{{ sheet.level }}</span><br>
+                            一级审批人：<span>{{ sheet.first_str }}</span><br>
                         {% elif sheet.approve_level == '3' %}
-                            <span style="color: orange">{{ sheet.level }}</span>
+                            审批级别：<span style="color: orange">{{ sheet.level }}</span><br>
+                            一级审批人：<span>{{ sheet.first_str }}</span><br>
+                            二级审批人：<span>{{ sheet.second_str }}</span><br>
                         {% endif %}
-                        <div class="agile-detail">
-                            <i class="fa fa-clock-o"></i> {{ sheet.publish_date }} {{ sheet.publish_time }}
-                            <a href="javascript:void(0)" class="pull-right btn btn-xs btn-primary">详情</a>
-                        </div>
+
+                        TAPD：{{ sheet.tapd_url }}<br>
+                        SQL：{{ sheet.sql }}<br>
+                        CONSUL KEY：{{ sheet.consul_key }}
                     </li>
                 {% endfor %}
 
@@ -46,22 +48,27 @@
                 id="approve_passed">
                 {% for sheet in outtime_notapprove_list %}
                     <li class="warning-element">
+                        <i class="fa fa-clock-o"></i> {{ sheet.publish_date }} {{ sheet.publish_time }}<br>
+                        创建人：{{ sheet.creator }}<br>
                         项目：{{ sheet.gogroup }}<br>
                         环境：{{ sheet.env }}<br>
                         服务：{{ sheet.services_str }}<br>
-                        TAPD：{{ sheet.tapd_url }}<br>
-                        审批级别：
+
                         {% if sheet.approve_level == '1' %}
-                            <span>{{ sheet.level }}</span>
+                            审批级别：<span>{{ sheet.level }}</span><br>
                         {% elif sheet.approve_level == '2' %}
-                            <span style="color: #0e9aef">{{ sheet.level }}</span>
+                            审批级别：<span style="color: #0e9aef">{{ sheet.level }}</span><br>
+                            一级审批人：<span>{{ sheet.first_str }}</span><br>
                         {% elif sheet.approve_level == '3' %}
-                            <span style="color: orange">{{ sheet.level }}</span>
+                            审批级别：<span style="color: orange">{{ sheet.level }}</span><br>
+                            一级审批人：<span>{{ sheet.first_str }}</span><br>
+                            二级审批人：<span>{{ sheet.second_str }}</span><br>
                         {% endif %}
-                        <div class="agile-detail">
-                            <i class="fa fa-clock-o"></i> {{ sheet.publish_date }} {{ sheet.publish_time }}
-                            <a href="javascript:void(0)" class="pull-right btn btn-xs btn-warning">发布</a>
-                        </div>
+
+                        TAPD：{{ sheet.tapd_url }}<br>
+                        SQL：{{ sheet.sql }}<br>
+                        CONSUL KEY：{{ sheet.consul_key }}
+
                     </li>
                 {% endfor %}
             </ul>
@@ -80,22 +87,26 @@
                 id="approve_passed">
                 {% for sheet in outtime_notpublish_list %}
                     <li class="warning-element">
+                        <i class="fa fa-clock-o"></i> {{ sheet.publish_date }} {{ sheet.publish_time }}<br>
+                        创建人：{{ sheet.creator }}<br>
                         项目：{{ sheet.gogroup }}<br>
                         环境：{{ sheet.env }}<br>
                         服务：{{ sheet.services_str }}<br>
-                        TAPD：{{ sheet.tapd_url }}<br>
-                        审批级别：
+
                         {% if sheet.approve_level == '1' %}
-                            <span>{{ sheet.level }}</span>
+                            审批级别：<span>{{ sheet.level }}</span><br>
                         {% elif sheet.approve_level == '2' %}
-                            <span style="color: #0e9aef">{{ sheet.level }}</span>
+                            审批级别：<span style="color: #0e9aef">{{ sheet.level }}</span><br>
+                            一级审批人：<span>{{ sheet.first_str }}</span><br>
                         {% elif sheet.approve_level == '3' %}
-                            <span style="color: orange">{{ sheet.level }}</span>
+                            审批级别：<span style="color: orange">{{ sheet.level }}</span><br>
+                            一级审批人：<span>{{ sheet.first_str }}</span><br>
+                            二级审批人：<span>{{ sheet.second_str }}</span><br>
                         {% endif %}
-                        <div class="agile-detail">
-                            <i class="fa fa-clock-o"></i> {{ sheet.publish_date }} {{ sheet.publish_time }}
-                            <a href="javascript:void(0)" class="pull-right btn btn-xs btn-warning">发布</a>
-                        </div>
+
+                        TAPD：{{ sheet.tapd_url }}<br>
+                        SQL：{{ sheet.sql }}<br>
+                        CONSUL KEY：{{ sheet.consul_key }}
                     </li>
                 {% endfor %}
             </ul>

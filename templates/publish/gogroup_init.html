@@ -180,9 +180,10 @@
                                             <div class="col-lg-6">
                                                 <div class="form-group">
                                                     <span style="color: red;">*</span><label>&nbsp;发布项目</label>
-                                                    <select class="form-control" id="project_name">
-                                                        {% for projectinfo in project_tuple %}
-                                                            <option value={{ projectinfo.0 }}>{{ projectinfo.0 }}</option>
+                                                    <select class="form-control" id="project_name"
+                                                            data-live-search="true">
+                                                        {% for projectinfo in gogroup_objs %}
+                                                            <option value={{ projectinfo.name }}>{{ projectinfo.name }}</option>
                                                         {% endfor %}
                                                     </select>
                                                 </div>
@@ -219,14 +220,14 @@
                                         <div class="row">
                                             <div class="col-lg-6">
                                                 <div class="form-group">
-                                                    <label>&nbsp;SQL (若有SQL需要执行，请让DBA执行后再发布)</label>
+                                                    <span style="color: red;">*</span><label>&nbsp;SQL (若有SQL需要执行，请让DBA执行后再发布)</label>
                                                     <textarea type="text" class="form-control" id="sql"
                                                               rows="5"></textarea>
                                                 </div>
                                             </div>
                                             <div class="col-lg-6">
                                                 <div class="form-group">
-                                                    <label>&nbsp;CONSUL KEY (若有consul key添加或修改，请让运维操作后再发布)</label>
+                                                    <span style="color: red;">*</span><label>&nbsp;CONSUL KEY (若有consul key添加或修改，请让运维操作后再发布)</label>
                                                     <textarea type="text" class="form-control" id="consul_key"
                                                               rows="5"></textarea>
                                                 </div>
@@ -237,9 +238,9 @@
                                         <div class="row">
                                             <div class="col-lg-6">
                                                 <div class="form-group">
-                                                    <span style="color: red;">*</span><label>发布日期</label>
+                                                    <span style="color: red;">*</span><label>&nbsp;发布日期</label>
                                                     <div class="input-group date" data-provide="datepicker">
-                                                        <input type="text" id="datepicker" class="form-control">
+                                                        <input type="text" id="datepicker" class="form-control" autocomplete="off">
                                                         <div class="input-group-addon">
                                                             <span class="glyphicon glyphicon-th"></span>
                                                         </div>
@@ -248,7 +249,7 @@
                                             </div>
                                             <div class="col-lg-6">
                                                 <div class="form-group">
-                                                    <span style="color: red;">*</span><label>开始发布时间</label>
+                                                    <span style="color: red;">*</span><label>&nbsp;开始发布时间</label>
                                                     <div class="input-group bootstrap-timepicker timepicker">
                                                         <input type="text"
                                                                class="form-control timepicker" id="publish_time">
@@ -262,7 +263,7 @@
                                         <br>
                                         <div class="text-center">
                                             <button class="btn btn-sm btn-primary m-t-n-xs" type="submit"
-                                                    id="create_publishsheet">保存
+                                                    id="create_publishsheet">创建发布单
                                             </button>
                                         </div>
                                     </form>
@@ -311,5 +312,13 @@
         </div>
     </div>
     <script src="/static/js/custom/gogroup_init.js"></script>
+
+    <style>
+        input:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0px 1000px white inset;
+            border: 1px solid #CCC !important;
+        }
+
+    </style>
 
 {% endblock %}

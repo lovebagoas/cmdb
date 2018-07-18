@@ -183,7 +183,6 @@ def LevelDetail(request):
     print content
     data = dict(code=errcode, msg=msg, content=content)
     return render_to_response('publish/level_detail_modal.html', data)
-    # return HttpResponse(json.dumps(data), content_type='application/json')
 
 
 @login_required
@@ -357,22 +356,37 @@ def PublishSheetList(request):
         publish_datetime_int = time.mktime(publish_datetime_format)
         now_int = time.time()
         if publish_datetime_int < now_int and publish.status == '1':
+            # 超时未审批
             publish.status = '6'
             publish.save()
         elif publish_datetime_int < now_int and publish.status == '3':
+            # 超时未发布
             publish.status = '5'
             publish.save()
         else:
             services_objs = publish.goservices.all().order_by('name')
             services_str = ', '.join(services_objs.values_list('name', flat=True))
             env = services_objs[0].get_env_display()
-            gogroup = services_objs[0].group.name
+            gogroup_obj = services_objs[0].group
             level = publish.approval_level.get_name_display()
             approve_level = publish.approval_level.name
+
+            if approve_level == '1':
+                first_str = ''
+                second_str = ''
+            elif approve_level == '2':
+                first_list = [owner.username for owner in publish.first_approver.all()]
+                first_str = ', '.join(first_list)
+                second_str = ''
+            else:
+                first_list = [owner.username for owner in publish.first_approver.all()]
+                first_str = ', '.join(first_list)
+                second_list = [owner.username for owner in publish.second_approver.all()]
+                second_str = ', '.join(second_list)
+
             tmp_dict = utils.serialize_instance(publish)
-            tmp_dict.update(
-                {'gogroup': gogroup, 'services_str': services_str, 'env': env, 'approve_level': approve_level,
-                 'level': level})
+            tmp_dict.update({'id': publish.id, 'gogroup': gogroup_obj.name, 'services_str': services_str, 'env': env,
+                             'approve_level': approve_level, 'level': level, 'first_str': first_str, 'second_str': second_str, 'creator': publish.creator.username})
 
             if publish.status == '1':
                 tobe_approved_list.append(tmp_dict)
@@ -402,12 +416,26 @@ def PublishSheetDoneList(request):
         services_objs = publish.goservices.all().order_by('name')
         services_str = ', '.join(services_objs.values_list('name', flat=True))
         env = services_objs[0].get_env_display()
-        gogroup = services_objs[0].group.name
+        gogroup_obj = services_objs[0].group
         level = publish.approval_level.get_name_display()
         approve_level = publish.approval_level.name
+
+        if approve_level == '1':
+            first_str = ''
+            second_str = ''
+        elif approve_level == '2':
+            first_list = [owner.username for owner in publish.first_approver.all()]
+            first_str = ', '.join(first_list)
+            second_str = ''
+        else:
+            first_list = [owner.username for owner in publish.first_approver.all()]
+            first_str = ', '.join(first_list)
+            second_list = [owner.username for owner in publish.second_approver.all()]
+            second_str = ', '.join(second_list)
+
         tmp_dict = utils.serialize_instance(publish)
-        tmp_dict.update({'gogroup': gogroup, 'services_str': services_str, 'env': env, 'approve_level': approve_level,
-                         'level': level})
+        tmp_dict.update({'gogroup': gogroup_obj.name, 'services_str': services_str, 'env': env, 'approve_level': approve_level,
+                         'level': level, 'first_str': first_str, 'second_str': second_str, 'creator': publish.creator.username})
 
         if publish.status == '4':
             done_list.append(tmp_dict)
@@ -424,6 +452,51 @@ def PublishSheetDoneList(request):
                 outtime_notapprove_list=outtime_notapprove_list)
 
     return render_to_response('publish/publish_done.html', data)
+
+
+@login_required
+def PublishSheetRefuseReason(request):
+    errcode = 0
+    msg = 'ok'
+    content = {}
+
+    sheet_id = int(request.GET['sheet_id'])
+
+    try:
+        sheet_obj = models.PublishSheet.objects.get(id=sheet_id)
+    except models.PublishSheet.DoesNotExist:
+        errcode = 500
+        msg = u'所选发布单不存在'
+    else:
+        try:
+            sheet_history_obj = models.PublishApprovalHistory.objects.get(publish_sheet=sheet_obj, approve_status=2)
+        except models.PublishApprovalHistory.DoesNotExist:
+            errcode = 500
+            msg = u'所选发布单审批记录不存在'
+        else:
+            content['approve_count'] = sheet_history_obj.approve_count
+            if sheet_obj.approval_level.name == '2':
+                # 一级审批被拒绝
+                content['approver'] = sheet_history_obj.first_approver.username
+                content['approve_time'] = sheet_history_obj.first_approve_time
+                content['refuse_reason'] = sheet_history_obj.refuse_reason
+            else:
+                # 二级审批
+                if sheet_history_obj.approve_count == '1':
+                    # 一级审批被拒绝
+                    content['approver'] = sheet_history_obj.first_approver.username
+                    content['approve_time'] = sheet_history_obj.first_approve_time
+                    content['refuse_reason'] = sheet_history_obj.refuse_reason
+                else:
+                    # 二级审批被拒绝
+                    content['approver'] = sheet_history_obj.second_approver.username
+                    content['approve_time'] = sheet_history_obj.second_approve_time
+                    content['refuse_reason'] = sheet_history_obj.refuse_reason
+
+    print 'content : '
+    print content
+    data = dict(code=errcode, msg=msg, content=content)
+    return render_to_response('publish/publish_sheet_refusereason.html', data)
 
 
 @login_required
@@ -444,57 +517,144 @@ def createPublishSheet(request):
     publish_time = request.POST['publish_time']
 
     try:
-        projectinfo_obj = models.ProjectInfo.objects.get(group__name=project_name)
-    except models.ProjectInfo.DoesNotExist:
+        gogroup_obj = asset_models.gogroup.objects.get(name=project_name)
+    except asset_models.gogroup.DoesNotExist:
         errcode = 500
-        msg = u'项目初始化信息不存在'
+        msg = u'go项目不存在'
         data = dict(code=errcode, msg=msg)
         return HttpResponse(json.dumps(data), content_type='application/json')
     else:
-        goservices_objs = asset_models.goservices.objects.filter(env=env_id).filter(name__in=reboot_services_list)
+        try:
+            projectinfo_obj = models.ProjectInfo.objects.get(group=gogroup_obj)
+        except models.ProjectInfo.DoesNotExist:
+            print 'no project info of this gogroup'
+            projectinfo_obj = None
+
         publishsheet_obj = models.PublishSheet()
         publishsheet_obj.creator = user
         publishsheet_obj.tapd_url = tapd_url
         publishsheet_obj.publish_date = publish_date
         publishsheet_obj.publish_time = publish_time
-        publishsheet_obj.project_info = projectinfo_obj
+        publishsheet_obj.sql = sql
+        publishsheet_obj.consul_key = consul_key
+        publishsheet_obj.status = '1'
 
+        slot = False  # 是否有级别定义
         publish_week = datetime.strptime(publish_date, '%Y-%m-%d').isoweekday()
 
-        timeslot_objs = models.TimeSlotLevel.objects.filter(project_info=projectinfo_obj)
-        slot = False
-        if len(timeslot_objs) > 0:
-            for time_obj in timeslot_objs:
-                start_week_int = int(time_obj.start_of_week)
-                end_week_int = int(time_obj.end_of_week)
-                if start_week_int < publish_week < end_week_int:
+        # 查看节假日时间段，二级审批
+        festival_objs = models.Festival.objects.all()
+        if len(festival_objs) > 0:
+            for festival_obj in festival_objs:
+                publish_time_format = time.strptime(str(publish_date) + ' ' + str(publish_time), '%Y-%m-%d %H:%M')
+                publish_time_int = time.mktime(publish_time_format)
+                start_time_format = time.strptime(festival_obj.start_day.strftime("%Y-%m-%d %H:%M"), '%Y-%m-%d %H:%M')
+                start_time_int = time.mktime(start_time_format)
+                if festival_obj.end_day:
+                    end_time_format = time.strptime(festival_obj.end_day.strftime("%Y-%m-%d %H:%M"), '%Y-%m-%d %H:%M')
+                    end_time_int = time.mktime(end_time_format)
+                else:
+                    end_time_int = start_time_int + 86400
+
+                if start_time_int <= publish_time_int <= end_time_int:
+                    publishsheet_obj.approval_level = models.ApprovalLevel.objects.get(name='3')
+                    print 'festival done'
+                    slot = True
+                    break
+
+        # 查看通用模板时间段
+        template_objs = models.TimeSlotLevel.objects.filter(is_global='2')
+        if len(template_objs) > 0:
+            for template_obj in template_objs:
+                start_week_int = int(template_obj.start_of_week)
+                end_week_int = int(template_obj.end_of_week)
+                print 'template  start_week_int : ', start_week_int
+                print 'template  end_week_int : ', end_week_int
+                print 'template  publish_week : ', publish_week
+                if start_week_int <= publish_week <= end_week_int:
                     publish_time_format = time.strptime(str(publish_date) + ' ' + str(publish_time), '%Y-%m-%d %H:%M')
-                    start_time_format = time.strptime(str(publish_date) + ' ' + str(time_obj.start_time),
+                    start_time_format = time.strptime(str(publish_date) + ' ' + str(template_obj.start_time),
                                                       '%Y-%m-%d %H:%M')
-                    end_time_format = time.strptime(str(publish_date) + ' ' + str(time_obj.end_time), '%Y-%m-%d %H:%M')
+                    end_time_format = time.strptime(str(publish_date) + ' ' + str(template_obj.end_time), '%Y-%m-%d %H:%M')
                     publish_time_int = time.mktime(publish_time_format)
                     start_time_int = time.mktime(start_time_format)
                     end_time_int = time.mktime(end_time_format)
-                    if start_time_int < publish_time_int < end_time_int:
-                        publishsheet_obj.approval_level = time_obj.approval_level
+                    if start_time_int == end_time_int:
+                        end_time_int = end_time_int + 86400
+                    if start_time_int <= publish_time_int <= end_time_int:
+                        publishsheet_obj.approval_level = template_obj.approval_level
+                        print 'template done'
                         slot = True
                         break
+
         if not slot:
+            # 查看自定义模板时间段
+            if projectinfo_obj:
+                custom_objs = projectinfo_obj.timeslot_level.all()
+                if len(custom_objs) > 0:
+                    for custom_obj in custom_objs:
+                        start_week_int = int(custom_obj.start_of_week)
+                        end_week_int = int(custom_obj.end_of_week)
+                        if start_week_int <= publish_week <= end_week_int:
+                            publish_time_format = time.strptime(str(publish_date) + ' ' + str(publish_time),
+                                                                '%Y-%m-%d %H:%M')
+                            start_time_format = time.strptime(str(publish_date) + ' ' + str(custom_obj.start_time),
+                                                              '%Y-%m-%d %H:%M')
+                            end_time_format = time.strptime(str(publish_date) + ' ' + str(custom_obj.end_time),
+                                                            '%Y-%m-%d %H:%M')
+                            publish_time_int = time.mktime(publish_time_format)
+                            start_time_int = time.mktime(start_time_format)
+                            end_time_int = time.mktime(end_time_format)
+                            if start_time_int <= publish_time_int <= end_time_int:
+                                publishsheet_obj.approval_level = custom_obj.approval_level
+                                print 'custom done'
+                                slot = True
+                                break
+
+        if not slot:
+            print 'no need done'
             publishsheet_obj.approval_level = models.ApprovalLevel.objects.get(name='1')
-
-        if sql:
-            publishsheet_obj.sql = sql
-
-        if consul_key:
-            publishsheet_obj.consul_key = consul_key
 
         publishsheet_obj.save()
 
+        if projectinfo_obj:
+            # 添加审批人
+            publishsheet_obj.first_approver = projectinfo_obj.first_approver.all()
+            publishsheet_obj.second_approver = projectinfo_obj.second_approver.all()
+
+        goservices_objs = asset_models.goservices.objects.filter(env=env_id).filter(name__in=reboot_services_list, group=gogroup_obj)
         for goservice in goservices_objs:
             publishsheet_obj.goservices.add(goservice)
 
         data = dict(code=errcode, msg=msg)
         return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+@login_required
+def PublishSheetDelete(request):
+    errcode = 0
+    msg = 'ok'
+    user = request.user
+    sheet_id = int(request.POST['sheet_id'])
+
+    try:
+        publish_obj = models.PublishSheet.objects.get(id=sheet_id)
+    except models.PublishSheet.DoesNotExist:
+        errcode = 500
+        msg = u'所选发布单不存在'
+    else:
+        if publish_obj.creator:
+            if publish_obj.creator == user:
+                publish_obj.delete()
+            else:
+                errcode = 500
+                msg = u'你不是创建人，不能删除'
+        else:
+            print 'no creator'
+            publish_obj.delete()
+
+    data = dict(code=errcode, msg=msg)
+    return HttpResponse(json.dumps(data), content_type='application/json')
 
 
 @login_required
@@ -506,20 +666,49 @@ def ApproveList(request):
     approve_refused_list = []
     approve_passed_list = []
     for publish in publishsheets:
-        services_objs = publish.goservices.all().order_by('name')
-        services_str = ', '.join(services_objs.values_list('name', flat=True))
-        env = services_objs[0].get_env_display()
-        gogroup = services_objs[0].group.name
-        approve_level = publish.approval_level.get_name_display()
-        tmp_dict = utils.serialize_instance(publish)
-        tmp_dict.update({'gogroup': gogroup, 'services_str': services_str, 'env': env, 'level': approve_level})
-
-        if publish.status == '1':
-            tobe_approved_list.append(tmp_dict)
-        elif publish.status == '2':
-            approve_refused_list.append(tmp_dict)
+        publish_datetime_str = publish.publish_date + ' ' + publish.publish_time
+        publish_datetime_format = time.strptime(publish_datetime_str, '%Y-%m-%d %H:%M')
+        publish_datetime_int = time.mktime(publish_datetime_format)
+        now_int = time.time()
+        if publish_datetime_int < now_int and publish.status == '1':
+            # 超时未审批
+            publish.status = '6'
+            publish.save()
         else:
-            approve_passed_list.append(tmp_dict)
+            services_objs = publish.goservices.all().order_by('name')
+            services_str = ', '.join(services_objs.values_list('name', flat=True))
+            env = services_objs[0].get_env_display()
+            gogroup_obj = services_objs[0].group
+            level = publish.approval_level.get_name_display()
+            approve_level = publish.approval_level.name
+
+            if approve_level == '1':
+                first_str = ''
+                second_str = ''
+                first_list = []
+                second_list = []
+            elif approve_level == '2':
+                first_list = [owner.username for owner in publish.first_approver.all()]
+                second_list = []
+                first_str = ', '.join(first_list)
+                second_str = ''
+            else:
+                first_list = [owner.username for owner in publish.first_approver.all()]
+                first_str = ', '.join(first_list)
+                second_list = [owner.username for owner in publish.second_approver.all()]
+                second_str = ', '.join(second_list)
+
+            if user.username in first_list or user.username in second_list:
+                tmp_dict = utils.serialize_instance(publish)
+                tmp_dict.update({'id': publish.id, 'gogroup': gogroup_obj.name, 'services_str': services_str, 'env': env,
+                         'approve_level': approve_level, 'level': level, 'first_str': first_str, 'second_str': second_str, 'creator': publish.creator.username})
+
+                if publish.status == '1':
+                    tobe_approved_list.append(tmp_dict)
+                elif publish.status == '2':
+                    approve_refused_list.append(tmp_dict)
+                else:
+                    approve_passed_list.append(tmp_dict)
 
     return render(request, 'publish/approve_list.html',
                   {'tobe_approved_list': tobe_approved_list, 'approve_refused_list': approve_refused_list,
@@ -540,6 +729,13 @@ def ApproveInit(request):
         return render_to_response('publish/publish_sheets.html', data)
     else:
         tmp_dict = utils.serialize_instance(publishsheet)
+        service_objs = publishsheet.goservices.all()
+        gogroup = service_objs[0].group
+        tmp_dict.update({
+            'group_name': gogroup.name,
+            'services': ', '.join(service_objs.values_list('name', flat=True)),
+            'env': service_objs[0].get_env_display()
+        })
         errcode = 0
         msg = 'ok'
         data = dict(code=errcode, msg=msg, approve_sheet=tmp_dict)

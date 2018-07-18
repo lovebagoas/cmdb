@@ -104,14 +104,15 @@ class PublishSheet(models.Model):
     )
     creator = models.ForeignKey(User, verbose_name=u"创建者", related_name="creator_of_publishsheet", default=1)
     goservices = models.ManyToManyField(goservices, verbose_name=u'重启服务', related_name='publish_goservices')
-    tapd_url = models.CharField(max_length=256, verbose_name=u"TAPD URL")
     publish_date = models.CharField(max_length=32, verbose_name=u"发布日期")
     publish_time = models.CharField(max_length=32, verbose_name=u"发布开始时间")
+    tapd_url = models.CharField(max_length=256, verbose_name=u"TAPD URL")
     sql = models.TextField(verbose_name=u"执行SQL", blank=True, null=True)
-    consul_key = models.CharField(max_length=100, verbose_name=u"consul key", blank=True, null=True)
+    consul_key = models.TextField(verbose_name=u"consul key", blank=True, null=True)
     status = models.CharField(choices=STATUS, max_length=32, verbose_name=u"发布单状态", default='1')
-    project_info = models.ForeignKey(ProjectInfo, blank=True, null=True)
     approval_level = models.ForeignKey(ApprovalLevel, blank=True, null=True)
+    first_approver = models.ManyToManyField(User, verbose_name=u'一级审批人', related_name='publishsheet_first_level_approver')
+    second_approver = models.ManyToManyField(User, verbose_name=u'二级审批人', related_name='publishsheet_second_level_approver')
 
     def __unicode__(self):
         return self.tapd_url
@@ -126,8 +127,12 @@ class PublishApprovalHistory(models.Model):
         ('1', u'通过'),
         ('2', u'拒绝'),
     )
+    APPROVE_COUNT = (
+        ('1', u'第一次审批'),
+        ('2', u'第二次审批'),
+    )
     publish_sheet = models.ForeignKey(PublishSheet)
-    approve_count = models.PositiveSmallIntegerField(verbose_name=u"审批次数", default=1)
+    approve_count = models.CharField(choices=APPROVE_COUNT, max_length=32, verbose_name=u"审批次数", default='1')
     approve_status = models.CharField(choices=APPROVE_STATUS, max_length=32, verbose_name=u"审批状态", default='1')
     refuse_reason = models.TextField(verbose_name=u"拒绝原因", blank=True, null=True)
     first_approver = models.ForeignKey(User, verbose_name=u'第一审批人', related_name='sheet_first_approver', blank=True, null=True)
@@ -141,5 +146,5 @@ class PublishApprovalHistory(models.Model):
         return self.publish_sheet.tapd_url
 
     class Meta:
-        verbose_name = u"发布单审批历史"
+        verbose_name = u"发布单审批记录"
         verbose_name_plural = verbose_name
