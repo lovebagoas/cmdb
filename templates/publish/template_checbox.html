@@ -1,0 +1,14 @@
+<div class="col-lg-12" id="approval_checkbox">
+    {% for timeslot in timeslot_objs %}
+        <div>
+            <label>
+                <input type="checkbox" value="{{ timeslot.id}}" name="approve_level_checkbox"> &nbsp;{{ timeslot.approval_level.get_name_display }}&nbsp;&nbsp;
+                {{ timeslot.get_start_of_week_display }}
+                ~ {{ timeslot.get_end_of_week_display }}&nbsp;&nbsp;&nbsp;&nbsp;{{ timeslot.start_time }}
+                ~ {{ timeslot.end_time }}&nbsp;&nbsp;
+                创建人：{{ timeslot.creator.username }}
+            </label>
+        </div>
+    {% endfor %}
+    <br>
+</div>

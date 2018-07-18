@@ -1,0 +1,128 @@
+<div class="col-lg-6">
+    <div class="ibox">
+        <div class="ibox-content">
+            <div class="text-center">
+                <h3>创建新模板</h3>
+                <p class="small"><i class="fa fa-cog"></i> 配置通用的【时间段<--->审批级别】模板</p>
+            </div>
+
+            <form role="form" id="init_form">
+                <div id="level_select">
+                    <div class="text-with-hr">
+                        <span>时间段</span>
+                    </div>
+                    <div class="select-level ibox">
+                        <form role="form">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <span style="color: red;">*</span><label>&nbsp;起始日</label>
+                                        <select class="form-control weekday-start" id="weekday_start">
+                                            <option value=1>周一</option>
+                                            <option value=2>周二</option>
+                                            <option value=3>周三</option>
+                                            <option value=4>周四</option>
+                                            <option value=5>周五</option>
+                                            <option value=6>周六</option>
+                                            <option value=7>周日</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <span style="color: red;">*</span><label>&nbsp;截止日</label>
+                                        <select class="form-control weekday-end" id="weekday_end">
+                                            <option value=1>周一</option>
+                                            <option value=2>周二</option>
+                                            <option value=3>周三</option>
+                                            <option value=4>周四</option>
+                                            <option value=5>周五</option>
+                                            <option value=6>周六</option>
+                                            <option value=7 selected>周日</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <span style="color: red;">*</span><label>&nbsp;起始时间</label>
+                                        <div class="input-group bootstrap-timepicker timepicker">
+                                            <input type="text"
+                                                   class="form-control input-small timepicker start-time"
+                                                   id="start_time">
+                                            <span class="input-group-addon"><i
+                                                    class="glyphicon glyphicon-time"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <span style="color: red;">*</span><label>&nbsp;截止时间</label>
+                                        <div class="input-group bootstrap-timepicker timepicker">
+                                            <input type="text"
+                                                   class="form-control input-small timepicker end-time" id="end_time">
+                                            <span class="input-group-addon"><i
+                                                    class="glyphicon glyphicon-time"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-with-hr">
+                                <span>审批级别</span>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <span style="color: red;">*</span><label> 级别</label>
+                                        <select class="form-control approve-select">
+                                            <option value='1' selected>无需审批</option>
+                                            <option value='2'>一级审批</option>
+                                            <option value='3'>二级审批</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <br>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button class="btn btn-sm btn-primary m-t-n-xs" type="submit"
+                            id="create_project_template">创建
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<div class="col-lg-6">
+    <div class="ibox">
+        <div class="ibox-content">
+            <div class="text-center">
+                <h3>已存在通用模板列表</h3>
+                <p class="small"><i class="fa fa-folder-open"></i> 已存在的【时间段<--->审批级别】模板列表</p>
+            </div>
+            <ul class="sortable-list connectList agile-list ui-sortable"
+                id="inprogress">
+                {% for timeslot in timeslot_objs %}
+                    <li class="success-element" id="{{ timeslot.id }}">
+                        <p>【{{ timeslot.get_is_global_display }}】<a class="close-li pull-right" style="color: #c4c4c4" href="javascript: void(0);" onclick="delete_timeslot('{{ timeslot.id }}')"><i class="fa fa-times"></i></a></p>
+                        <p>{{ timeslot.approval_level.get_name_display }} : {{ timeslot.get_start_of_week_display }}
+                            ~ {{ timeslot.get_end_of_week_display }}&nbsp;&nbsp;&nbsp;&nbsp;{{ timeslot.start_time }}
+                            ~ {{ timeslot.end_time }}</p>
+                        <p>创建人：{{ timeslot.creator.username }}</p>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/custom/template_list.js"></script>

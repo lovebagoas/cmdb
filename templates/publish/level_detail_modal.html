@@ -1,0 +1,65 @@
+<form class="form-horizontal">
+    <div class="form-group">
+        <label class="col-lg-2 control-label" id="crontab_modify">模板类型</label>
+        <div class="col-lg-10">
+            <input type="text" class="form-control" id="level_type" readonly value="{{ content.level_type }}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">时间段</label>
+        <div class="col-lg-10">
+            <input type="text" class="form-control" id="time" readonly value="{{ content.time }}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">审批级别</label>
+        <div class="col-lg-10">
+            <input type="text" class="form-control" id="level" readonly value="{{ content.approval_level }}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">包含项目</label>
+        <div class="col-lg-10">
+            <ul class="sortable-list connectList agile-list ui-sortable"
+                id="inprogress">
+                {% for projectinfo in content.project_list %}
+                    <li class="success-element" id="{{ projectinfo.project_id }}">
+                        <p>项目： {{ projectinfo.project_name }} <a class="close-li pull-right"
+                                                                 style="color: #c4c4c4"
+                                                                 href="javascript: void(0);"
+                                                                 onclick="delete_projectinfo('{{ projectinfo.project_id }}')"><i
+                                class="fa fa-times"></i></a></p>
+
+                        <p>负责人：
+                            {% for owner in projectinfo.owner_list %}
+                                {{ owner }}&nbsp;
+                            {% endfor %}
+                        </p>
+                        <p>通知邮件组：
+                            {% if projectinfo.mailgroup_list %}
+                                {% for mailgroup in projectinfo.mailgroup_list %}
+                                    {{ mailgroup }}&nbsp;
+                                {% endfor %}
+                            {% endif %}
+                        </p>
+
+                        {% if projectinfo.first_list %}
+                            <p>一级审批人：
+                                {% for first in projectinfo.first_list %}
+                                    {{ first }}&nbsp;
+                                {% endfor %}
+                            </p>
+                        {% endif %}
+                        {% if projectinfo.second_list %}
+                            <p>二级审批人：
+                                {% for second in projectinfo.second_list %}
+                                    {{ second }}&nbsp;
+                                {% endfor %}
+                            </p>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</form>

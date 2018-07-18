@@ -1,0 +1,200 @@
+<div class="col-lg-6">
+    <div class="ibox">
+        <div class="ibox-content">
+            <div class="text-center">
+                <h3>配置审批级别</h3>
+                <p class="small"><i class="fa fa-cog"></i> 配置项目的审批级别</p>
+            </div>
+
+            <form role="form" id="init_form">
+                <div class="form-group">
+                    <span style="color: red;">*</span><label>&nbsp;项目</label>
+                    <select class="form-control" id="project_select2" multiple="multiple"
+                            data-live-search="true">
+                        {% for project in project_objs %}
+                            <option value={{ project.id }}>{{ project.group.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <span style="color: red;">*</span><label>&nbsp;审批级别</label>
+                    <div>
+                        <label>
+                            <input type="radio" value="1" id="optionsRadios1"
+                                   name="optionsRadios" checked="">&nbsp;自定义
+                        </label>
+                    </div>
+
+                    <div>
+                        <label>
+                            <input type="radio" value="2" id="optionsRadios2"
+                                   name="optionsRadios">&nbsp;批量导入模板
+                        </label>
+                    </div>
+                </div>
+
+                <div class="text-with-hr">
+                    <span>日期----级别</span>
+                </div>
+
+                <div id="level_select2">
+                    <div class="select-level ibox">
+                        <div class="ibox-tools">
+                            <a class="close-level-set">
+                                <i class="fa fa-times" style="color: red"></i>
+                            </a>
+                        </div>
+
+                        <form role="form">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label>起始日</label>
+                                        <select class="form-control weekday-start">
+                                            <option value=1>周一</option>
+                                            <option value=2>周二</option>
+                                            <option value=3>周三</option>
+                                            <option value=4>周四</option>
+                                            <option value=5>周五</option>
+                                            <option value=6>周六</option>
+                                            <option value=7>周日</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label>截止日</label>
+                                        <select class="form-control weekday-end">
+                                            <option value=1>周一</option>
+                                            <option value=2>周二</option>
+                                            <option value=3>周三</option>
+                                            <option value=4>周四</option>
+                                            <option value=5>周五</option>
+                                            <option value=6>周六</option>
+                                            <option value=7 selected>周日</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label>起始时间</label>
+                                        <div class="input-group bootstrap-timepicker timepicker">
+                                            <input type="text"
+                                                   class="form-control input-small timepicker start-time">
+                                            <span class="input-group-addon"><i
+                                                    class="glyphicon glyphicon-time"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label>截止时间</label>
+                                        <div class="input-group bootstrap-timepicker timepicker">
+                                            <input type="text"
+                                                   class="form-control input-small timepicker end-time">
+                                            <span class="input-group-addon"><i
+                                                    class="glyphicon glyphicon-time"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label>审批级别</label>
+                                        <select class="form-control level-select">
+                                            <option value='1' selected>无需审批</option>
+                                            <option value='2'>一级审批</option>
+                                            <option value='3'>二级审批</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <br>
+                    </div>
+                </div>
+
+                <div class="text-right" id="add_button">
+                    <button type='button' class='btn btn-sm btn-success m-t-n-xs'
+                            id='add_level_select2'><i
+                            class='fa fa-plus'></i></button>
+                </div>
+
+                <br>
+
+                <div class="text-center">
+                    <button class="btn btn-sm btn-primary m-t-n-xs" type="submit"
+                            id="create_level">保存
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<div class="col-lg-6">
+    <div class="ibox">
+        <div class="ibox-content">
+            <div class="text-center">
+                <h3>项目--审批级别列表</h3>
+                <p class="small"><i class="fa fa-folder-open"></i> 已存在的项目--审批级别列表</p>
+            </div>
+            <ul class="sortable-list connectList agile-list ui-sortable"
+                id="inprogress">
+                {% for level in level_list %}
+                    <li class="success-element" id="{{ level.timeslot.id }}">
+                        <p>【{{ level.timeslot.get_is_global_display }}】<a class="close-li pull-right"
+                                                                          style="color: #c4c4c4"
+                                                                          href="javascript: void(0);"
+                                                                          onclick="delete_level('{{ level.timeslot.id }}')"><i
+                                class="fa fa-times"></i></a></p>
+                        <p>{{ level.timeslot.approval_level }} : {{ level.timeslot.get_start_of_week_display }}
+                            ~ {{ level.timeslot.get_end_of_week_display }}&nbsp;&nbsp;&nbsp;&nbsp;{{ level.timeslot.start_time }}
+                            ~ {{ level.timeslot.end_time }}</p>
+                        <p>项目：
+                            {% for project in level.project_list %}
+                                {{ project.group.name }}
+                                &nbsp; {% endfor %}
+                        </p>
+
+                        <a data-toggle="modal" data-target="#levelDetailModal" class="pull-right btn btn-xs btn-primary"
+                           onclick="levelDetail('{{ level.timeslot.id }}')">
+                            详情
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="modal inmodal fade" id="levelDetailModal" tabindex="-1" role="dialog"
+     aria-labelledby="addModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content animated fadeIn">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span
+                        aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                <i class="fa fa-clock-o modal-icon"></i>
+                <h4 class="modal-title" id="minion_old">项目--审批级别详情</h4>
+            </div>
+            <div class="modal-body" id="level_detail_modal">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+                {#                <button type="button" class="btn btn-primary" id="modifyCrontabButton">保存#}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/custom/level_list.js"></script>

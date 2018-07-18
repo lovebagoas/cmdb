@@ -16,7 +16,9 @@
 {% block content %}
     <div class="tabs-container">
         <ul class="nav nav-tabs">
-            <li id="projectInfo" class="active"><a data-toggle="tab" href="#tab-1">项目信息</a></li>
+            <li id="projectInfo" class="active"><a data-toggle="tab" href="#tab-1">项目初始化</a></li>
+            <li id="approvalLevelList" class=""><a data-toggle="tab" href="#tab-6">配置审批级别</a></li>
+            <li id="initTemplate" class="" style="display: none"><a data-toggle="tab" href="#tab-5">通用模板</a></li>
             <li id="publishSheet" class=""><a data-toggle="tab" href="#tab-2">发布单</a></li>
             <li id="createTab" class="" style="display: none"><a data-toggle="tab" href="#tab-3">创建发布单</a></li>
             <li id="doneSheet" class="" style="display: none"><a data-toggle="tab" href="#tab-4">完成&作废</a></li>
@@ -30,14 +32,14 @@
                                 <div class="ibox-content">
                                     <div class="text-center">
                                         <h3>项目初始化</h3>
-                                        <p class="small"><i class="fa fa-cog"></i> 新增项目，并配置相关信息</p>
-
+                                        <p class="small"><i class="fa fa-cog"></i> 配置项目的基本信息</p>
                                     </div>
 
                                     <form role="form" id="init_form">
                                         <div class="form-group">
                                             <span style="color: red;">*</span><label>&nbsp;项目</label>
-                                            <select class="form-control" id="project_select">
+                                            <select class="form-control" id="project_select" multiple="multiple"
+                                                    data-live-search="true">
                                                 {% for gogroup in gogroup_objs %}
                                                     <option value={{ gogroup.id }}>{{ gogroup.name }}</option>
                                                 {% endfor %}
@@ -49,6 +51,15 @@
                                                     class="form-control" data-live-search="true">
                                                 {% for gogroup in user_objs %}
                                                     <option value={{ gogroup.id }}>{{ gogroup.username }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>&nbsp;通知邮件组</label>
+                                            <select id="mailgroup_select" multiple="multiple"
+                                                    class="form-control" data-live-search="true">
+                                                {% for gogroup in mailgroup_objs %}
+                                                    <option value={{ gogroup.id }}>{{ gogroup.email }}</option>
                                                 {% endfor %}
                                             </select>
                                         </div>
@@ -70,109 +81,10 @@
                                                 {% endfor %}
                                             </select>
                                         </div>
-                                        <div class="form-group">
-                                            <label>&nbsp;通知邮件组</label>
-                                            <select id="mailgroup_select" multiple="multiple"
-                                                    class="form-control" data-live-search="true">
-                                                {% for gogroup in mailgroup_objs %}
-                                                    <option value={{ gogroup.id }}>{{ gogroup.email }}</option>
-                                                {% endfor %}
-                                            </select>
-                                        </div>
 
-                                        <div class="text-with-hr">
-                                            <span>审批级别</span>
-                                        </div>
-
-                                        <div id="level_select">
-                                            <div class="select-level ibox">
-                                                <div class="ibox-tools">
-                                                    <a class="close-level-set">
-                                                        <i class="fa fa-times" style="color: #ed5565"></i>
-                                                    </a>
-                                                </div>
-
-                                                <form role="form">
-                                                    <div class="row">
-                                                        <div class="col-lg-6">
-                                                            <div class="form-group">
-                                                                <label>起始日</label>
-                                                                <select class="form-control weekday-start">
-                                                                    <option value=1>周一</option>
-                                                                    <option value=2>周二</option>
-                                                                    <option value=3>周三</option>
-                                                                    <option value=4>周四</option>
-                                                                    <option value=5>周五</option>
-                                                                    <option value=6>周六</option>
-                                                                    <option value=7>周日</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-lg-6">
-                                                            <div class="form-group">
-                                                                <label>截止日</label>
-                                                                <select class="form-control weekday-end">
-                                                                    <option value=1>周一</option>
-                                                                    <option value=2>周二</option>
-                                                                    <option value=3>周三</option>
-                                                                    <option value=4>周四</option>
-                                                                    <option value=5>周五</option>
-                                                                    <option value=6>周六</option>
-                                                                    <option value=7 selected>周日</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="row">
-                                                        <div class="col-lg-6">
-                                                            <div class="form-group">
-                                                                <label>起始时间</label>
-                                                                <div class="input-group bootstrap-timepicker timepicker">
-                                                                    <input type="text"
-                                                                           class="form-control input-small timepicker start-time">
-                                                                    <span class="input-group-addon"><i
-                                                                            class="glyphicon glyphicon-time"></i></span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-lg-6">
-                                                            <div class="form-group">
-                                                                <label>截止时间</label>
-                                                                <div class="input-group bootstrap-timepicker timepicker">
-                                                                    <input type="text"
-                                                                           class="form-control input-small timepicker end-time">
-                                                                    <span class="input-group-addon"><i
-                                                                            class="glyphicon glyphicon-time"></i></span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="row">
-                                                        <div class="col-lg-12">
-                                                            <div class="form-group">
-                                                                <label>审批级别</label>
-                                                                <select class="form-control level-select">
-                                                                    <option value='1' selected>无需审批</option>
-                                                                    <option value='2'>一级审批</option>
-                                                                    <option value='3'>二级审批</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                                <br>
-                                            </div>
-                                        </div>
-
-                                        <div class="text-right">
-                                            <button type="button" class="btn btn-sm btn-success m-t-n-xs"
-                                                    id="add_level_select"><i
-                                                    class="fa fa-plus"></i></button>
-                                        </div>
 
                                         <br>
+
                                         <div class="text-center">
                                             <button class="btn btn-sm btn-primary m-t-n-xs" type="submit"
                                                     id="create_projectinfo">保存
@@ -183,54 +95,50 @@
                                 </div>
                             </div>
                         </div>
+
                         <div class="col-lg-6">
                             <div class="ibox">
                                 <div class="ibox-content">
                                     <div class="text-center">
-                                        <h3>项目列表</h3>
-                                        <p class="small"><i class="fa fa-folder-open"></i> 已存在的项目列表</p>
+                                        <h3>项目信息列表</h3>
+                                        <p class="small"><i class="fa fa-folder-open"></i> 已存在的项目初始化信息列表</p>
                                     </div>
                                     <ul class="sortable-list connectList agile-list ui-sortable"
                                         id="inprogress">
-                                        {% for project in project_tuple %}
-                                            <li class="success-element">
-                                                <p>项目：{{ project.0 }}</p>
+                                        {% for projectinfo in project_list %}
+                                            <li class="success-element" id="{{ projectinfo.project_id }}">
+                                                <p>项目： {{ projectinfo.project_name }} <a class="close-li pull-right"
+                                                                                         style="color: #c4c4c4"
+                                                                                         href="javascript: void(0);"
+                                                                                         onclick="delete_projectinfo('{{ projectinfo.project_id }}')"><i
+                                                        class="fa fa-times"></i></a></p>
+
                                                 <p>负责人：
-                                                    {% for owner in project.1.0 %}
+                                                    {% for owner in projectinfo.owner_list %}
                                                         {{ owner }}&nbsp;
                                                     {% endfor %}
                                                 </p>
                                                 <p>通知邮件组：
-                                                    {% for mailgroup in project.1.1 %}
-                                                        {{ mailgroup }}&nbsp;
-                                                    {% endfor %}
+                                                    {% if projectinfo.mailgroup_list %}
+                                                        {% for mailgroup in projectinfo.mailgroup_list %}
+                                                            {{ mailgroup }}&nbsp;
+                                                        {% endfor %}
+                                                    {% endif %}
                                                 </p>
 
-                                                {% if project.1|length > 5 %}
-                                                    {% for level in project.1|slice:"2:5" %}
-                                                        <div class="agile-detail">
-                                                            <i class="fa fa-clock-o"></i> {{ level.approval_level }}
-                                                            : {{ level.start_of_week }} ~ {{ level.end_of_week }}&nbsp;&nbsp;&nbsp;&nbsp;{{ level.start_time }}
-                                                            ~ {{ level.end_time }}<br>
-                                                        </div>
-                                                    {% endfor %}
-                                                    <div class="agile-detail">
-                                                        <i class="fa fa-clock-o"></i> ...
-                                                    </div>
-                                                    <a href="javascript:void(0)"
-                                                       class="pull-right btn btn-xs btn-primary"
-                                                       onclick="sendProjectValue('{{ project.0 }}')">详情</a>
-                                                {% else %}
-                                                    {% for level in project.1|slice:"2:" %}
-                                                        <div class="agile-detail">
-                                                            <i class="fa fa-clock-o"></i> {{ level.approval_level }}
-                                                            : {{ level.start_of_week }} ~ {{ level.end_of_week }}&nbsp;&nbsp;&nbsp;&nbsp;{{ level.start_time }}
-                                                            ~ {{ level.end_time }}<br>
-                                                        </div>
-                                                    {% endfor %}
-                                                    <a href="javascript:void(0)"
-                                                       class="pull-right btn btn-xs btn-primary"
-                                                       onclick="sendProjectValue('{{ project.0 }}')">详情</a>
+                                                {% if projectinfo.first_list %}
+                                                    <p>一级审批人：
+                                                        {% for first in projectinfo.first_list %}
+                                                            {{ first }}&nbsp;
+                                                        {% endfor %}
+                                                    </p>
+                                                {% endif %}
+                                                {% if projectinfo.second_list %}
+                                                    <p>二级审批人：
+                                                        {% for second in projectinfo.second_list %}
+                                                            {{ second }}&nbsp;
+                                                        {% endfor %}
+                                                    </p>
                                                 {% endif %}
                                             </li>
                                         {% endfor %}
@@ -369,6 +277,32 @@
             <div id="tab-4" class="tab-pane">
                 <div class="wrapper wrapper-content animated fadeInRight">
                     <div class="row" id="done_outtime_sheet">
+
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-5" class="tab-pane">
+                <div class="wrapper wrapper-content animated fadeInRight">
+                    <div class="row" id="init_template">
+
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-6" class="tab-pane">
+                <div class="wrapper wrapper-content animated fadeInRight">
+                    <div class="row text-right">
+                        <div class="col-lg-12">
+                            <button class="btn btn-info btn-rounded m-t-n-xs" type="submit"
+                                    id="template_init">
+                                <i class="fa fa-angle-double-right"></i>
+                                通用模板
+                            </button>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row" id="approval_level_list">
 
                     </div>
                 </div>

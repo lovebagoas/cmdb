@@ -1,14 +1,11 @@
 $(document).ready(function () {
     init_tab1();
-    init_approval_level();
-
 });
 
 function init_tab1() {
     $('#project_select').select2({
-        language: 'zh-CN',
-        width: '100%',
         placeholder: '请选择',
+        allowClear: true
     });
 
     $('#owner_select').select2({
@@ -53,6 +50,7 @@ function init_tab2() {
 $("#projectInfo").click(function () {
     document.getElementById('createTab').style.display = 'none';
     document.getElementById('doneSheet').style.display = 'none';
+    document.getElementById('initTemplate').style.display = 'none';
     $("#publishSheet").removeClass("active");
     $("#tab-2").removeClass("active");
     $("#createTab").removeClass("active");
@@ -62,11 +60,16 @@ $("#projectInfo").click(function () {
     $("#doneSheet").removeClass("active");
     $("#tab-4").removeClass("active");
     init_tab1();
+    $("#initTemplate").removeClass("active");
+    $("#tab-5").removeClass("active");
+    $("#approvalLevelList").removeClass("active");
+    $("#tab-6").removeClass("active");
 });
 
 $("#publishSheet").click(function () {
     document.getElementById('createTab').style.display = 'none';
     document.getElementById('doneSheet').style.display = 'none';
+    document.getElementById('initTemplate').style.display = 'none';
     $("#projectInfo").removeClass("active");
     $("#tab-1").removeClass("active");
     $("#createTab").removeClass("active");
@@ -76,166 +79,34 @@ $("#publishSheet").click(function () {
     $("#doneSheet").removeClass("active");
     $("#tab-4").removeClass("active");
     init_tab2();
+    $("#initTemplate").removeClass("active");
+    $("#tab-5").removeClass("active");
+    $("#approvalLevelList").removeClass("active");
+    $("#tab-6").removeClass("active");
 });
 
-function init_approval_level() {
-    $('.weekday-start').select2({
-        minimumResultsForSearch: Infinity,
-        language: 'zh-CN',
-        width: '100%',
-        placeholder: '请选择',
-    });
-    $('.weekday-end').select2({
-        minimumResultsForSearch: Infinity,
-        language: 'zh-CN',
-        width: '100%',
-        placeholder: '请选择',
-    });
-
-    $('.form-control.input-small.timepicker').timepicker({
-        minuteStep: 30,
-        showMeridian: false,   // 24hr mode
-        defaultTime: '0:00',
-    });
-
-
-    $('.level-select').select2({
-        minimumResultsForSearch: Infinity,
-        language: 'zh-CN',
-        width: '100%',
-        placeholder: '请选择',
-    });
-}
-
-$('#add_level_select').click(function () {
-    let level_obj = document.getElementsByClassName("select-level");
-    // let level_str = level_obj[0].outerHTML;
-
-    let append_str = " <div class='select-level ibox'>\n" +
-        "                                                <div class='ibox-tools'>\n" +
-        "                                                    <a class='close-level-set'>\n" +
-        "                                                        <i class='fa fa-times' style='color: #ed5565'></i>\n" +
-        "                                                    </a>\n" +
-        "                                                </div>\n" +
-        "\n" +
-        "                                                <form role='form'>\n" +
-        "                                                    <div class='row'>\n" +
-        "                                                        <div class='col-lg-6'>\n" +
-        "                                                            <div class='form-group'>\n" +
-        "                                                                <label>起始日</label>\n" +
-        "                                                                <select class='form-control weekday-start'>\n" +
-        "                                                                    <option value=1>周一</option>\n" +
-        "                                                                    <option value=2>周二</option>\n" +
-        "                                                                    <option value=3>周三</option>\n" +
-        "                                                                    <option value=4>周四</option>\n" +
-        "                                                                    <option value=5>周五</option>\n" +
-        "                                                                    <option value=6>周六</option>\n" +
-        "                                                                    <option value=7>周日</option>\n" +
-        "                                                                </select>\n" +
-        "                                                            </div>\n" +
-        "                                                        </div>\n" +
-        "                                                        <div class='col-lg-6'>\n" +
-        "                                                            <div class='form-group'>\n" +
-        "                                                                <label>截止日</label>\n" +
-        "                                                                <select class='form-control weekday-end'>\n" +
-        "                                                                    <option value=1>周一</option>\n" +
-        "                                                                    <option value=2>周二</option>\n" +
-        "                                                                    <option value=3>周三</option>\n" +
-        "                                                                    <option value=4>周四</option>\n" +
-        "                                                                    <option value=5>周五</option>\n" +
-        "                                                                    <option value=6>周六</option>\n" +
-        "                                                                    <option value=7 selected>周日</option>\n" +
-        "                                                                </select>\n" +
-        "                                                            </div>\n" +
-        "                                                        </div>\n" +
-        "                                                    </div>\n" +
-        "\n" +
-        "                                                    <div class='row'>\n" +
-        "                                                        <div class='col-lg-6'>\n" +
-        "                                                            <div class='form-group'>\n" +
-        "                                                                <label>起始时间</label>\n" +
-        "                                                                <div class='input-group bootstrap-timepicker timepicker'>\n" +
-        "                                                                    <input type='text'\n" +
-        "                                                                           class='form-control input-small timepicker start-time'>\n" +
-        "                                                                    <span class='input-group-addon'><i\n" +
-        "                                                                            class='glyphicon glyphicon-time'></i></span>\n" +
-        "                                                                </div>\n" +
-        "                                                            </div>\n" +
-        "                                                        </div>\n" +
-        "                                                        <div class='col-lg-6'>\n" +
-        "                                                            <div class='form-group'>\n" +
-        "                                                                <label>截止时间</label>\n" +
-        "                                                                <div class='input-group bootstrap-timepicker timepicker'>\n" +
-        "                                                                    <input type='text'\n" +
-        "                                                                           class='form-control input-small timepicker end-time'>\n" +
-        "                                                                    <span class='input-group-addon'><i\n" +
-        "                                                                            class='glyphicon glyphicon-time'></i></span>\n" +
-        "                                                                </div>\n" +
-        "                                                            </div>\n" +
-        "                                                        </div>\n" +
-        "                                                    </div>\n" +
-        "\n" +
-        "                                                    <div class='row'>\n" +
-        "                                                        <div class='col-lg-12'>\n" +
-        "                                                            <div class='form-group'>\n" +
-        "                                                                <label>审批级别</label>\n" +
-        "                                                                <select class='form-control level-select'>\n" +
-        "                                                                    <option value='1' selected>无需审批</option>\n" +
-        "                                                                    <option value='2'>一级审批</option>\n" +
-        "                                                                    <option value='3'>二级审批</option>\n" +
-        "                                                                </select>\n" +
-        "                                                            </div>\n" +
-        "                                                        </div>\n" +
-        "                                                    </div>\n" +
-        "                                                </form>\n" +
-        "                                                <br>\n" +
-        "                                            </div> ";
-
-
-    $('#level_select').append(append_str);
-    init_approval_level();
-    $('.close-level-set').click(function () {
-        let content = $(this).closest('div.ibox');
-        if (level_obj.length != 1) {
-            content.remove();
-        }
-        else {
-            return false;
-        }
-    });
-});
 
 $('#create_projectinfo').click(function () {
-    let project_select = $('#project_select').val();
+    let project_select_list = $('#project_select').val();
     let owner_select_list = $('#owner_select').val();
     let first_select_list = $('#first_select').val();
     let second_select_list = $('#second_select').val();
     let mailgroup_select_list = $('#mailgroup_select').val();
 
-    if (!project_select || !owner_select_list) {
+    if (!project_select_list || !owner_select_list) {
         alert("必填内容不能为空 ！");
         return false;
     }
-
-    let weekday_start_list = $('.weekday-start');
-    let weekday_end_list = $('.weekday-end');
-    let time_start_list = $('.start-time');
-    let time_end_list = $('.end-time');
-    let level_select_list = $('.level-select');
-    let level_list = [];
-    weekday_start_list.each(function (index, el) {
-        level_list.push([el.value, weekday_end_list[index].value, time_start_list[index].value, time_end_list[index].value, level_select_list[index].value]);
-    });
-
-    let url = '/asset/createProject/';
     let data = {
-        'project_name': project_select,
+        'project_select_list': project_select_list,
         'owner_select_list': owner_select_list,
         'first_select_list': first_select_list,
         'second_select_list': second_select_list,
         'mailgroup_select_list': mailgroup_select_list,
-        'level_list': level_list,
     };
+
+
+    let url = '/asset/project/init/create/';
     $.ajax({
         url: url,
         type: "POST",
@@ -253,6 +124,7 @@ $('#create_projectinfo').click(function () {
             }
             else {
                 alert(result.msg);
+                window.location.reload();
                 $("#create_projectinfo").removeAttr("disabled");
             }
             $("#page_loading").hide();
@@ -265,8 +137,8 @@ $('#create_projectinfo').click(function () {
     });
 });
 
-function sendProjectValue(project_name) {
-    $("#project_name").val(project_name);
+function sendValue(timeslot_id) {
+    $("#timeslot_id").val(timeslot_id);
 
 }
 
@@ -311,6 +183,7 @@ $("#create_publishsheet").click(function () {
             if (result.code === 0) {
                 document.getElementById('createTab').style.display = 'none';
                 document.getElementById('doneSheet').style.display = 'none';
+                document.getElementById('initTemplate').style.display = 'none';
                 $("#projectInfo").removeClass("active");
                 $("#tab-1").removeClass("active");
                 $("#createTab").removeClass("active");
@@ -320,6 +193,10 @@ $("#create_publishsheet").click(function () {
                 $("#doneSheet").removeClass("active");
                 $("#tab-4").removeClass("active");
                 init_tab2();
+                $("#initTemplate").removeClass("active");
+                $("#tab-5").removeClass("active");
+                $("#approvalLevelList").removeClass("active");
+                $("#tab-6").removeClass("active");
             }
             else {
                 alert(result.msg);
@@ -337,6 +214,7 @@ $("#create_publishsheet").click(function () {
 
 $("#done_sheets").click(function () {
     document.getElementById('createTab').style.display = 'none';
+    document.getElementById('initTemplate').style.display = 'none';
     document.getElementById('doneSheet').style.display = '';
     $("#projectInfo").removeClass("active");
     $("#tab-1").removeClass("active");
@@ -344,15 +222,19 @@ $("#done_sheets").click(function () {
     $("#tab-2").removeClass("active");
     $("#createTab").removeClass("active");
     $("#tab-3").removeClass("active");
+    $("#initTemplate").removeClass("active");
+    $("#tab-5").removeClass("active");
 
     $("#doneSheet").addClass("active");
     $("#tab-4").addClass("active");
     init_tab4();
+    $("#approvalLevelList").removeClass("active");
+    $("#tab-6").removeClass("active");
 });
 
 
 function init_tab4() {
-    let url = '/asset/publishsheet/list/done';
+    let url = '/asset/publishsheet/list/done/';
     $.ajax({
         url: url,
         type: "GET",
@@ -362,6 +244,119 @@ function init_tab4() {
         success: function (result) {
             if (result.length > 0) {
                 $("#done_outtime_sheet").html(result);
+            }
+            $("#page_loading").hide();
+        },
+        error: function () {
+            alert('失败');
+            $("#page_loading").hide();
+        }
+    });
+}
+
+$("#template_init").click(function () {
+    document.getElementById('createTab').style.display = 'none';
+    document.getElementById('doneSheet').style.display = 'none';
+    document.getElementById('initTemplate').style.display = '';
+    $("#projectInfo").removeClass("active");
+    $("#tab-1").removeClass("active");
+    $("#publishSheet").removeClass("active");
+    $("#tab-2").removeClass("active");
+    $("#createTab").removeClass("active");
+    $("#tab-3").removeClass("active");
+    $("#doneSheet").removeClass("active");
+    $("#tab-4").removeClass("active");
+
+    $("#initTemplate").addClass("active");
+    $("#tab-5").addClass("active");
+    init_tab5();
+    $("#approvalLevelList").removeClass("active");
+    $("#tab-6").removeClass("active");
+});
+
+function init_tab5() {
+    let url = '/asset/project/template/list/';
+    $.ajax({
+        url: url,
+        type: "GET",
+        beforeSend: function () {
+            $("#page_loading").show();
+        },
+        success: function (result) {
+            if (result.length > 0) {
+                $("#init_template").html(result);
+            }
+            $("#page_loading").hide();
+        },
+        error: function () {
+            alert('失败');
+            $("#page_loading").hide();
+        }
+    });
+}
+
+$("#approvalLevelList").click(function () {
+    document.getElementById('createTab').style.display = 'none';
+    document.getElementById('doneSheet').style.display = 'none';
+    document.getElementById('initTemplate').style.display = 'none';
+     $("#projectInfo").removeClass("active");
+    $("#tab-1").removeClass("active");
+    $("#publishSheet").removeClass("active");
+    $("#tab-2").removeClass("active");
+    $("#createTab").removeClass("active");
+    $("#tab-3").removeClass("active");
+    $("#doneSheet").removeClass("active");
+    $("#tab-4").removeClass("active");
+    $("#initTemplate").removeClass("active");
+    $("#tab-5").removeClass("active");
+
+    $("#approvalLevelList").addClass("active");
+    $("#tab-6").addClass("active");
+    init_tab6();
+});
+
+function init_tab6() {
+    let url = '/asset/project/level/list/';
+    $.ajax({
+        url: url,
+        type: "GET",
+        beforeSend: function () {
+            $("#page_loading").show();
+        },
+        success: function (result) {
+            if (result.length > 0) {
+                $("#approval_level_list").html(result);
+            }
+            $("#page_loading").hide();
+        },
+        error: function () {
+            alert('失败');
+            $("#page_loading").hide();
+        }
+    });
+}
+
+function delete_projectinfo(projectinfo_id) {
+    let url = '/asset/project/init/delete/';
+    let data = {
+        'projectinfo_id': projectinfo_id,
+    };
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: data,
+        contentType: 'application/x-www-form-urlencoded',
+        traditional: true,
+        beforeSend: function () {
+            // 禁用按钮防止重复提交
+            $("#page_loading").show();
+        },
+        success: function (result) {
+            if (result.code === 0) {
+                $("#"+projectinfo_id).remove();
+            }
+            else {
+                alert(result.msg);
             }
             $("#page_loading").hide();
         },

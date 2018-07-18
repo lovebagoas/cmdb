@@ -5,30 +5,16 @@ from django.contrib.auth.models import User
 from asset.models import gogroup, goservices
 
 
-class MailGroup(models.Model):
-    email = models.CharField(max_length=255)
-    name = models.CharField(max_length=64, blank=True, null=True)
+class Festival(models.Model):
+    name = models.CharField(max_length=32, verbose_name=u"节日名称")
+    start_day = models.DateField('日期')
+    end_day = models.DateField('日期', null=True, blank=True)
 
     def __unicode__(self):
-        return self.email
+        return self.name
 
     class Meta:
-        verbose_name = u"邮件组"
-        verbose_name_plural = verbose_name
-
-
-class ProjectInfo(models.Model):
-    group = models.ForeignKey(gogroup)
-    owner = models.ManyToManyField(User, verbose_name=u'负责人', related_name='project_owner')
-    mail_group = models.ManyToManyField(MailGroup, verbose_name=u'邮件组', related_name='project_mail_group')
-    first_approver = models.ManyToManyField(User, verbose_name=u'一级审批人', related_name='project_first_level_approver')
-    second_approver = models.ManyToManyField(User, verbose_name=u'二级审批人', related_name='project_second_level_approver')
-
-    def __unicode__(self):
-        return u'项目 : ' + self.group.name
-
-    class Meta:
-        verbose_name = u"项目初始化"
+        verbose_name = u"节假日"
         verbose_name_plural = verbose_name
 
 
@@ -48,7 +34,7 @@ class ApprovalLevel(models.Model):
         verbose_name_plural = verbose_name
 
 
-class TimeSlot(models.Model):
+class TimeSlotLevel(models.Model):
     DAY = (
         ('1', u'周一'),
         ('2', u'周二'),
@@ -58,31 +44,52 @@ class TimeSlot(models.Model):
         ('6', u'周六'),
         ('7', u'周日'),
     )
-    project_info = models.ForeignKey(ProjectInfo)
-    start_of_week = models.CharField(choices=DAY, max_length=32, verbose_name=u"起始", default='1')
-    end_of_week = models.CharField(choices=DAY, max_length=32, verbose_name=u"截止", default='7')
+    GLOBAL = (
+        ('1', u'自定义模板'),
+        ('2', u'通用模板'),
+    )
+    is_global = models.CharField(choices=GLOBAL, max_length=32, verbose_name=u"是否通用模板", default='1')
+    start_of_week = models.CharField(choices=DAY, max_length=32, verbose_name=u"起始日", default='1')
+    end_of_week = models.CharField(choices=DAY, max_length=32, verbose_name=u"截止日", default='7')
     start_time = models.CharField(verbose_name=u'开始时间点', max_length=32, blank=True, null=True)
     end_time = models.CharField(verbose_name=u'结束时间点', max_length=32, blank=True, null=True)
     approval_level = models.ForeignKey(ApprovalLevel)
+    creator = models.ForeignKey(User, verbose_name=u"创建者", related_name="creator_of_timeslotlevel", blank=True, null=True)
 
     def __unicode__(self):
-        return u'时间段 : ' + self.project_info.group.name
+        return self.start_of_week + ' ' + self.end_of_week + ' ' + self.start_time + ' ' + self.end_time + ' ' + self.approval_level.get_name_display()
 
     class Meta:
-        verbose_name = u"时间段"
+        verbose_name = u"时间段--审批级别"
         verbose_name_plural = verbose_name
 
 
-class Festival(models.Model):
-    name = models.CharField(max_length=32, verbose_name=u"节日名称")
-    start_day = models.DateField('日期')
-    end_day = models.DateField('日期', null=True, blank=True)
+class MailGroup(models.Model):
+    email = models.CharField(max_length=255)
+    name = models.CharField(max_length=64, blank=True, null=True)
 
     def __unicode__(self):
-        return self.name
+        return self.email
 
     class Meta:
-        verbose_name = u"节假日"
+        verbose_name = u"邮件组"
+        verbose_name_plural = verbose_name
+
+
+class ProjectInfo(models.Model):
+    group = models.ForeignKey(gogroup)
+    owner = models.ManyToManyField(User, verbose_name=u'负责人', related_name='project_owner')
+    mail_group = models.ManyToManyField(MailGroup, verbose_name=u'邮件组', related_name='project_mail_group')
+    first_approver = models.ManyToManyField(User, verbose_name=u'一级审批人', related_name='project_first_level_approver')
+    second_approver = models.ManyToManyField(User, verbose_name=u'二级审批人', related_name='project_second_level_approver')
+    timeslot_level = models.ManyToManyField(TimeSlotLevel, verbose_name=u'时间段-审批级别', related_name='project_timeslotlevel')
+    creator = models.ForeignKey(User, verbose_name=u"创建者", related_name="creator_of_projectinfo", null=True, blank=True)
+
+    def __unicode__(self):
+        return u'项目 : ' + self.group.name
+
+    class Meta:
+        verbose_name = u"项目初始化"
         verbose_name_plural = verbose_name
 
 
@@ -93,6 +100,7 @@ class PublishSheet(models.Model):
         ('3', u'审批通过'),
         ('4', u'完成发布'),
         ('5', u'虽审批通过，但超时未发布'),
+        ('6', u'超时未审批'),
     )
     creator = models.ForeignKey(User, verbose_name=u"创建者", related_name="creator_of_publishsheet", default=1)
     goservices = models.ManyToManyField(goservices, verbose_name=u'重启服务', related_name='publish_goservices')

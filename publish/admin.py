@@ -24,9 +24,9 @@ class ApprovalLevelAdmin(admin.ModelAdmin):
     search_fields = ['name']
 
 
-class TimeSlotAdmin(admin.ModelAdmin):
-    list_display = ('project_info', 'start_of_week', 'end_of_week', 'start_time', 'end_time', 'approval_level')
-    search_fields = ['project_info', 'approval_level']
+class TimeSlotLevelAdmin(admin.ModelAdmin):
+    list_display = ('start_of_week', 'end_of_week', 'start_time', 'end_time', 'approval_level')
+    search_fields = ['approval_level']
 
 
 class FestivalAdmin(admin.ModelAdmin):
@@ -37,5 +37,5 @@ class FestivalAdmin(admin.ModelAdmin):
 admin.site.register(MailGroup, MailGroupAdmin)
 admin.site.register(ProjectInfo, ProjectInfoAdmin)
 admin.site.register(ApprovalLevel, ApprovalLevelAdmin)
-admin.site.register(TimeSlot, TimeSlotAdmin)
+admin.site.register(TimeSlotLevel, TimeSlotLevelAdmin)
 admin.site.register(Festival, FestivalAdmin)

@@ -1,5 +1,5 @@
 
-<div class="col-lg-6">
+<div class="col-lg-4">
     <div class="ibox">
         <div class="ibox-content">
             <div class="text-center">
@@ -35,16 +35,50 @@
     </div>
 </div>
 
-<div class="col-lg-6">
+<div class="col-lg-4">
     <div class="ibox">
         <div class="ibox-content">
             <div class="text-center">
-                <h3>超时作废</h3>
-                <p class="small" style="color: darkorange"><i class="fa fa-warning"></i> 未在发布时间点发布</p>
+                <h3>超时未审批</h3>
+                <p class="small" style="color: darkorange"><i class="fa fa-warning"></i> 未在发布时间点前审批</p>
             </div>
             <ul class="sortable-list connectList agile-list ui-sortable"
                 id="approve_passed">
-                {% for sheet in outtime_list %}
+                {% for sheet in outtime_notapprove_list %}
+                    <li class="warning-element">
+                        项目：{{ sheet.gogroup }}<br>
+                        环境：{{ sheet.env }}<br>
+                        服务：{{ sheet.services_str }}<br>
+                        TAPD：{{ sheet.tapd_url }}<br>
+                        审批级别：
+                        {% if sheet.approve_level == '1' %}
+                            <span>{{ sheet.level }}</span>
+                        {% elif sheet.approve_level == '2' %}
+                            <span style="color: #0e9aef">{{ sheet.level }}</span>
+                        {% elif sheet.approve_level == '3' %}
+                            <span style="color: orange">{{ sheet.level }}</span>
+                        {% endif %}
+                        <div class="agile-detail">
+                            <i class="fa fa-clock-o"></i> {{ sheet.publish_date }} {{ sheet.publish_time }}
+                            <a href="javascript:void(0)" class="pull-right btn btn-xs btn-warning">发布</a>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="col-lg-4">
+    <div class="ibox">
+        <div class="ibox-content">
+            <div class="text-center">
+                <h3>超时未发布</h3>
+                <p class="small" style="color: darkorange"><i class="fa fa-warning"></i> 未在发布时间点按时发布</p>
+            </div>
+            <ul class="sortable-list connectList agile-list ui-sortable"
+                id="approve_passed">
+                {% for sheet in outtime_notpublish_list %}
                     <li class="warning-element">
                         项目：{{ sheet.gogroup }}<br>
                         环境：{{ sheet.env }}<br>
