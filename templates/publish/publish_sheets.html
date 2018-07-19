@@ -23,7 +23,7 @@
                         创建人：{{ sheet.creator }}<br>
                         项目：{{ sheet.gogroup }}<br>
                         环境：{{ sheet.env }}<br>
-                        服务：{{ sheet.services_str }}<br>
+                        重启服务：{{ sheet.services_str }}<br>
 
                         {% if sheet.approve_level == '1' %}
                             审批级别：<span>{{ sheet.level }}</span><br>
@@ -36,7 +36,7 @@
                             二级审批人：<span>{{ sheet.second_str }}</span><br>
                         {% endif %}
 
-                        TAPD：{{ sheet.tapd_url }}<br>
+                        TAPD URL：{{ sheet.tapd_url }}<br>
                         SQL：{{ sheet.sql }}<br>
                         CONSUL KEY：{{ sheet.consul_key }}
                     </li>
@@ -61,7 +61,7 @@
                         创建人：{{ sheet.creator }}<br>
                         项目：{{ sheet.gogroup }}<br>
                         环境：{{ sheet.env }}<br>
-                        服务：{{ sheet.services_str }}<br>
+                        重启服务：{{ sheet.services_str }}<br>
 
                         {% if sheet.approve_level == '1' %}
                             审批级别：<span>{{ sheet.level }}</span><br>
@@ -74,11 +74,13 @@
                             二级审批人：<span>{{ sheet.second_str }}</span><br>
                         {% endif %}
 
-                        TAPD：{{ sheet.tapd_url }}<br>
+                        TAPD URL：{{ sheet.tapd_url }}<br>
                         SQL：{{ sheet.sql }}<br>
                         CONSUL KEY：{{ sheet.consul_key }}<br>
                         <div class="agile-detail">
-                            <a data-toggle="modal" data-target="#sheetRefuseReasonModal" class="pull-right btn btn-xs btn-danger" onclick="sheetRefuseReasonDetail('{{ sheet.id }}')">原因</a>
+                            <a data-toggle="modal" data-target="#sheetRefuseReasonModal"
+                               class="pull-right btn btn-xs btn-danger"
+                               onclick="sheetRefuseReasonDetail('{{ sheet.id }}')">原因</a>
                         </div>
                     </li>
                 {% endfor %}
@@ -90,7 +92,7 @@
     <div class="ibox">
         <div class="ibox-content">
             <div class="text-center">
-                <h3>审批通过，待发布</h3>
+                <h3>无需审批/审批通过，待发布</h3>
                 <p class="small" style="color: darkorange"><i class="fa fa-warning"></i> 审批完成，请按时完成发布</p>
             </div>
             <ul class="sortable-list connectList agile-list ui-sortable"
@@ -101,7 +103,7 @@
                         创建人：{{ sheet.creator }}<br>
                         项目：{{ sheet.gogroup }}<br>
                         环境：{{ sheet.env }}<br>
-                        服务：{{ sheet.services_str }}<br>
+                        重启服务：{{ sheet.services_str }}<br>
 
                         {% if sheet.approve_level == '1' %}
                             审批级别：<span>{{ sheet.level }}</span><br>
@@ -114,12 +116,23 @@
                             二级审批人：<span>{{ sheet.second_str }}</span><br>
                         {% endif %}
 
-                        TAPD：{{ sheet.tapd_url }}<br>
+                        TAPD URL：{{ sheet.tapd_url }}<br>
                         SQL：{{ sheet.sql }}<br>
                         CONSUL KEY：{{ sheet.consul_key }}<br>
-                        <div class="agile-detail">
-                            <a href="javascript:void(0)" class="pull-right btn btn-xs btn-warning">发布</a>
-                        </div>
+
+                        {% if sheet.can_publish %}
+                            <div class="agile-detail">
+                                <a data-toggle="modal" data-target="#publishModal"
+                                   class="pull-right btn btn-xs btn-warning"
+                                   onclick="sheet_detail('{{ sheet.id }}')">发布</a>
+                            </div>
+                        {% else %}
+                            <div class="agile-detail">
+                                <a data-toggle="modal" data-target="#publishModal"
+                                   class="pull-right btn btn-xs btn-warning"
+                                   onclick="sheet_detail('{{ sheet.id }}')" disabled="">发布</a>
+                            </div>
+                        {% endif %}
                     </li>
                 {% endfor %}
             </ul>
@@ -135,7 +148,7 @@
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal"><span
                         aria-hidden="true">×</span><span class="sr-only">Close</span></button>
-                <i class="fa fa-times modal-icon"></i>
+                <i class="fa fa-times modal-icon" style="color: red"></i>
                 <h4 class="modal-title" id="minion_old">拒绝原因</h4>
             </div>
             <div class="modal-body" id="refuse_reason_modal">
@@ -147,6 +160,14 @@
                 </button>
             </div>
         </div>
+    </div>
+</div>
+
+<div class="modal inmodal fade" id="publishModal" tabindex="-1" role="dialog"
+     aria-labelledby="addModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg" id="sheet_modal">
+
     </div>
 </div>
 

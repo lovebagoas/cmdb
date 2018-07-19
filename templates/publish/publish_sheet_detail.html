@@ -1,0 +1,140 @@
+<div class="modal-content animated fadeIn">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span
+                aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+        <i class="fa fa-stack-exchange modal-icon"></i>
+        <h4 class="modal-title" id="minion_old">发布单详情</h4>
+    </div>
+    <div class="modal-body">
+        <form class="form-horizontal">
+            <div class="form-group">
+                <label class="col-lg-2 control-label">创建人</label>
+                <div class="col-lg-10">
+                    <input type="text" class="form-control" id="level_type" readonly
+                           value="{{ content.creator }}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">项目</label>
+                <div class="col-lg-10">
+                    <input type="text" class="form-control" id="level_type" readonly
+                           value="{{ content.gogroup }}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">环境</label>
+                <div class="col-lg-10">
+                    <input type="text" class="form-control" id="level_type" readonly value="{{ content.env }}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">重启服务</label>
+                <div class="col-lg-10">
+                    <input type="text" class="form-control" id="level_type" readonly
+                           value="{{ content.services_str }}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">TAPD URL</label>
+                <div class="col-lg-10">
+                    <input type="text" class="form-control" id="level_type" readonly
+                           value="{{ content.tapd_url }}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">SQL</label>
+                <div class="col-lg-10">
+                    <input type="text" class="form-control" id="level_type" readonly value="{{ content.sql }}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">CONSUL KEY</label>
+                <div class="col-lg-10">
+                    <input type="text" class="form-control" id="level_type" readonly
+                           value="{{ content.consul_key }}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">审批级别</label>
+                <div class="col-lg-10">
+                    <input type="text" class="form-control" id="level_type" readonly
+                           value="{{ content.level }}">
+                </div>
+            </div>
+
+            {% if content.approve_level != '1' %}
+                {% if content.approve_count == '1' %}
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label" id="crontab_modify">第一级审批人</label>
+                        <div class="col-lg-10">
+                            <input type="text" class="form-control" id="level_type" readonly
+                                   value="{{ content.first_approver }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">审批时间</label>
+                        <div class="col-lg-10">
+                            <input type="text" class="form-control" id="time" readonly
+                                   value="{{ content.first_approve_time|date:'Y-m-d H:i' }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">第一级审批结果</label>
+                        <div class="col-lg-10">
+                            <input type="text" class="form-control" id="time" readonly
+                                   value="通过">
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label" id="crontab_modify">第一级审批人</label>
+                        <div class="col-lg-10">
+                            <input type="text" class="form-control" id="level_type" readonly
+                                   value="{{ content.first_approver }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">审批时间</label>
+                        <div class="col-lg-10">
+                            <input type="text" class="form-control" id="time" readonly
+                                   value="{{ content.first_approve_time|date:'Y-m-d H:i' }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">第一级审批结果</label>
+                        <div class="col-lg-10">
+                            <input type="text" class="form-control" id="time" readonly
+                                   value="通过">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label" id="crontab_modify">第二级审批人</label>
+                        <div class="col-lg-10">
+                            <input type="text" class="form-control" id="level_type" readonly
+                                   value="{{ content.second_approver }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">审批时间</label>
+                        <div class="col-lg-10">
+                            <input type="text" class="form-control" id="time" readonly
+                                   value="{{ content.second_approve_time|date:'Y-m-d H:i' }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">第二级审批结果</label>
+                        <div class="col-lg-10">
+                            <input type="text" class="form-control" id="time" readonly
+                                   value="通过">
+                        </div>
+                    </div>
+                {% endif %}
+            {% endif %}
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+        <button type="button" class="btn btn-primary" onclick="start_publish('{{ content.id }}')">确认发布
+        </button>
+    </div>
+</div>

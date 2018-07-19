@@ -157,6 +157,14 @@ $("#create_publishsheet").click(function () {
         return false;
     }
 
+    if (tapd_url.match("tower.im") || tapd_url.match("tapd.cn")){
+        console.log('url ok');
+    }
+    else{
+        alert('TAPD URL格式不正确');
+        return false;
+    }
+
     let url = '/asset/publishsheet/create/';
     let data = {
         'project_name': project_name,

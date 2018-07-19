@@ -121,3 +121,47 @@ function sheetRefuseReasonDetail(sheet_id) {
         }
     });
 }
+
+function sheet_detail(sheet_id) {
+    let url = '/asset/publishsheet/detail/?sheet_id=' + sheet_id;
+    $.ajax({
+        url: url,
+        type: "GET",
+        success: function (result) {
+            if (result.length > 0) {
+                $("#sheet_modal").html(result);
+            }
+        },
+        error: function () {
+            alert('失败');
+        }
+    });
+}
+
+function start_publish(sheet_id) {
+    alert(sheet_id);
+    let url = '/asset/publishsheet/publish/start/';
+    let data = {
+        'sheet_id': sheet_id
+    };
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: data,
+        contentType: 'application/x-www-form-urlencoded',
+        traditional: true,
+        success: function (result) {
+            if (result.code === 0) {
+                alert('发布成功，请检查服务是否正常！！！');
+            }
+            else {
+                alert(result.msg);
+            }
+            $("#page_loading").hide();
+        },
+        error: function () {
+            alert('失败');
+        }
+    });
+}
+

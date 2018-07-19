@@ -27,7 +27,7 @@
                                     <div class="text-center">
                                         <h3>待审批
                                         </h3>
-                                        <p class="small"><i class="fa fa-clock-o"></i> 请在发布时间之前审批</p>
+                                        <p class="small"><i class="fa fa-clock-o"></i> 请在发布时间点之前审批</p>
                                     </div>
 
                                     <ul class="sortable-list connectList agile-list ui-sortable" id="to_be_approved">
@@ -38,7 +38,7 @@
                                                 创建人：{{ sheet.creator }}<br>
                                                 项目：{{ sheet.gogroup }}<br>
                                                 环境：{{ sheet.env }}<br>
-                                                服务：{{ sheet.services_str }}<br>
+                                                重启服务：{{ sheet.services_str }}<br>
 
                                                 {% if sheet.approve_level == '1' %}
                                                     审批级别：<span>{{ sheet.level }}</span><br>
@@ -51,20 +51,15 @@
                                                     二级审批人：<span>{{ sheet.second_str }}</span><br>
                                                 {% endif %}
 
-                                                TAPD：{{ sheet.tapd_url }}<br>
+                                                TAPD URL：{{ sheet.tapd_url }}<br>
                                                 SQL：{{ sheet.sql }}<br>
                                                 CONSUL KEY：{{ sheet.consul_key }}
 
                                                 <div class="agile-detail">
-                                                    {% if sheet.can_approve %}
-                                                        <a href="javascript:void(0)"
-                                                           class="pull-right btn btn-xs btn-success"
-                                                           onclick="approveSheet('{{ sheet.id }}')">审批</a>
-                                                    {% else %}
-                                                        <a href="javascript:void(0)"
-                                                           class="pull-right btn btn-xs btn-success"
-                                                           onclick="approveSheet('{{ sheet.id }}')" disabled="">审批</a>
-                                                    {% endif %}
+                                                    <a href="javascript:void(0)"
+                                                       class="pull-right btn btn-xs btn-success"
+                                                       onclick="approveSheet('{{ sheet.id }}')">审批</a>
+
                                                 </div>
                                             </li>
                                         {% endfor %}
@@ -87,9 +82,18 @@
                                             <li class="danger-element">
                                                 项目：{{ sheet.gogroup }}<br>
                                                 环境：{{ sheet.env }}<br>
-                                                服务：{{ sheet.services_str }}<br>
-                                                TAPD：{{ sheet.tapd_url }}<br>
-                                                审批级别：{{ sheet.level }}
+                                                重启服务：{{ sheet.services_str }}<br>
+                                                TAPD URL：{{ sheet.tapd_url }}<br>
+                                                {% if sheet.approve_level == '1' %}
+                                                    审批级别：<span>{{ sheet.level }}</span><br>
+                                                {% elif sheet.approve_level == '2' %}
+                                                    审批级别：<span style="color: #0e9aef">{{ sheet.level }}</span><br>
+                                                    一级审批人：<span>{{ sheet.first_str }}</span><br>
+                                                {% elif sheet.approve_level == '3' %}
+                                                    审批级别：<span style="color: orange">{{ sheet.level }}</span><br>
+                                                    一级审批人：<span>{{ sheet.first_str }}</span><br>
+                                                    二级审批人：<span>{{ sheet.second_str }}</span><br>
+                                                {% endif %}
                                                 <div class="agile-detail">
                                                     <a data-toggle="modal" data-target="#sheetRefuseReasonModal"
                                                        class="pull-right btn btn-xs btn-danger"
@@ -115,10 +119,18 @@
                                             <li class="success-element">
                                                 项目：{{ sheet.gogroup }}<br>
                                                 环境：{{ sheet.env }}<br>
-                                                服务：{{ sheet.services_str }}<br>
-                                                TAPD：{{ sheet.tapd_url }}<br>
-                                                审批级别：{{ sheet.level }}
-
+                                                重启服务：{{ sheet.services_str }}<br>
+                                                TAPD URL：{{ sheet.tapd_url }}<br>
+                                                {% if sheet.approve_level == '1' %}
+                                                    审批级别：<span>{{ sheet.level }}</span><br>
+                                                {% elif sheet.approve_level == '2' %}
+                                                    审批级别：<span style="color: #0e9aef">{{ sheet.level }}</span><br>
+                                                    一级审批人：<span>{{ sheet.first_str }}</span><br>
+                                                {% elif sheet.approve_level == '3' %}
+                                                    审批级别：<span style="color: orange">{{ sheet.level }}</span><br>
+                                                    一级审批人：<span>{{ sheet.first_str }}</span><br>
+                                                    二级审批人：<span>{{ sheet.second_str }}</span><br>
+                                                {% endif %}
                                             </li>
                                         {% endfor %}
                                     </ul>
