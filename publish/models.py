@@ -137,10 +137,10 @@ class PublishApprovalHistory(models.Model):
     refuse_reason = models.TextField(verbose_name=u"拒绝原因", blank=True, null=True)
     first_approver = models.ForeignKey(User, verbose_name=u'第一审批人', related_name='sheet_first_approver', blank=True, null=True)
     first_approve_time = models.DateTimeField(verbose_name=u'第一审批时间', auto_now_add=True, blank=True, null=True)
-    first_notices = models.TextField(verbose_name=u"第一审批人批注的注意事项", blank=True, null=True)
+    # first_notices = models.TextField(verbose_name=u"第一审批人批注的注意事项", blank=True, null=True)
     second_approver = models.ForeignKey(User, verbose_name=u'第二审批人', related_name='sheet_second_approver', blank=True, null=True)
     second_approve_time = models.DateTimeField(verbose_name=u'第二审批时间', auto_now_add=True, blank=True, null=True)
-    second_notices = models.TextField(verbose_name=u"第二审批人批注的注意事项", blank=True, null=True)
+    # second_notices = models.TextField(verbose_name=u"第二审批人批注的注意事项", blank=True, null=True)
 
     def __unicode__(self):
         return self.publish_sheet.tapd_url

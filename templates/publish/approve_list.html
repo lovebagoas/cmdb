@@ -56,9 +56,15 @@
                                                 CONSUL KEY：{{ sheet.consul_key }}
 
                                                 <div class="agile-detail">
-                                                    <a href="javascript:void(0)"
-                                                       class="pull-right btn btn-xs btn-success"
-                                                       onclick="approveSheet('{{ sheet.id }}')">审批</a>
+                                                    {% if sheet.can_approve %}
+                                                        <a href="javascript:void(0)"
+                                                           class="pull-right btn btn-xs btn-success"
+                                                           onclick="approveSheet('{{ sheet.id }}')">审批</a>
+                                                    {% else %}
+                                                        <a href="javascript:void(0)"
+                                                           class="pull-right btn btn-xs btn-success"
+                                                           onclick="approveSheet('{{ sheet.id }}')" disabled="">审批</a>
+                                                    {% endif %}
                                                 </div>
                                             </li>
                                         {% endfor %}

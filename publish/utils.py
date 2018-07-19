@@ -1,5 +1,6 @@
 # coding:utf8
 import json
+import re
 
 from functools import partial
 from django.core.serializers import serialize
@@ -23,3 +24,10 @@ def serialize_instance(obj):
         return serialize_queryset([obj])[0]
     else:
         return None
+
+
+def cut_str(str, len):
+    cut_len = r'.{%s}' % len
+    str_list = re.findall(cut_len, str)
+    new_str = '\n'.join(str_list)
+    return new_str

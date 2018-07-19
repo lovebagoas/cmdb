@@ -385,6 +385,10 @@ def PublishSheetList(request):
                 second_str = ', '.join(second_list)
 
             tmp_dict = utils.serialize_instance(publish)
+            if len(publish.sql) > 40:
+                tmp_dict['sql'] = utils.cut_str(publish.sql, 40)
+            if len(publish.consul_key) > 40:
+                tmp_dict['consul_key'] = utils.cut_str(publish.consul_key, 40)
             tmp_dict.update({'id': publish.id, 'gogroup': gogroup_obj.name, 'services_str': services_str, 'env': env,
                              'approve_level': approve_level, 'level': level, 'first_str': first_str, 'second_str': second_str, 'creator': publish.creator.username})
 
@@ -434,6 +438,10 @@ def PublishSheetDoneList(request):
             second_str = ', '.join(second_list)
 
         tmp_dict = utils.serialize_instance(publish)
+        if len(publish.sql) > 40:
+            tmp_dict['sql'] = utils.cut_str(publish.sql, 40)
+        if len(publish.consul_key) > 40:
+            tmp_dict['consul_key'] = utils.cut_str(publish.consul_key, 40)
         tmp_dict.update({'gogroup': gogroup_obj.name, 'services_str': services_str, 'env': env, 'approve_level': approve_level,
                          'level': level, 'first_str': first_str, 'second_str': second_str, 'creator': publish.creator.username})
 
@@ -476,25 +484,25 @@ def PublishSheetRefuseReason(request):
         else:
             content['approve_count'] = sheet_history_obj.approve_count
             if sheet_obj.approval_level.name == '2':
-                # 一级审批被拒绝
-                content['approver'] = sheet_history_obj.first_approver.username
-                content['approve_time'] = sheet_history_obj.first_approve_time
+                # 一级审批, 被拒绝
+                content['first_approver'] = sheet_history_obj.first_approver.username
+                content['first_approve_time'] = sheet_history_obj.first_approve_time
                 content['refuse_reason'] = sheet_history_obj.refuse_reason
             else:
                 # 二级审批
                 if sheet_history_obj.approve_count == '1':
                     # 一级审批被拒绝
-                    content['approver'] = sheet_history_obj.first_approver.username
-                    content['approve_time'] = sheet_history_obj.first_approve_time
+                    content['first_approver'] = sheet_history_obj.first_approver.username
+                    content['first_approve_time'] = sheet_history_obj.first_approve_time
                     content['refuse_reason'] = sheet_history_obj.refuse_reason
                 else:
                     # 二级审批被拒绝
-                    content['approver'] = sheet_history_obj.second_approver.username
-                    content['approve_time'] = sheet_history_obj.second_approve_time
+                    content['first_approver'] = sheet_history_obj.second_approver.username
+                    content['first_approve_time'] = sheet_history_obj.first_approve_time
+                    content['second_approver'] = sheet_history_obj.second_approver.username
+                    content['second_approve_time'] = sheet_history_obj.second_approve_time
                     content['refuse_reason'] = sheet_history_obj.refuse_reason
 
-    print 'content : '
-    print content
     data = dict(code=errcode, msg=msg, content=content)
     return render_to_response('publish/publish_sheet_refusereason.html', data)
 
@@ -698,17 +706,34 @@ def ApproveList(request):
                 second_list = [owner.username for owner in publish.second_approver.all()]
                 second_str = ', '.join(second_list)
 
-            if user.username in first_list or user.username in second_list:
-                tmp_dict = utils.serialize_instance(publish)
-                tmp_dict.update({'id': publish.id, 'gogroup': gogroup_obj.name, 'services_str': services_str, 'env': env,
-                         'approve_level': approve_level, 'level': level, 'first_str': first_str, 'second_str': second_str, 'creator': publish.creator.username})
+            tmp_dict = utils.serialize_instance(publish)
+            if len(publish.sql) > 40:
+                tmp_dict['sql'] = utils.cut_str(publish.sql, 40)
+            if len(publish.consul_key) > 40:
+                tmp_dict['consul_key'] = utils.cut_str(publish.consul_key, 40)
 
+            if user.username in first_list:
+                tmp_dict.update({'id': publish.id, 'gogroup': gogroup_obj.name, 'services_str': services_str, 'env': env,
+                         'approve_level': approve_level, 'level': level, 'first_str': first_str, 'second_str': second_str, 'creator': publish.creator.username, 'can_approve': True})
                 if publish.status == '1':
                     tobe_approved_list.append(tmp_dict)
                 elif publish.status == '2':
                     approve_refused_list.append(tmp_dict)
                 else:
                     approve_passed_list.append(tmp_dict)
+            elif user.username in second_list:
+                tmp_dict.update(
+                    {'id': publish.id, 'gogroup': gogroup_obj.name, 'services_str': services_str, 'env': env,
+                     'approve_level': approve_level, 'level': level, 'first_str': first_str, 'second_str': second_str,
+                     'creator': publish.creator.username, 'can_approve': False})
+                if publish.status == '1':
+                    tobe_approved_list.append(tmp_dict)
+                elif publish.status == '2':
+                    approve_refused_list.append(tmp_dict)
+                else:
+                    approve_passed_list.append(tmp_dict)
+            print 'tmp_dict : '
+            print tmp_dict
 
     return render(request, 'publish/approve_list.html',
                   {'tobe_approved_list': tobe_approved_list, 'approve_refused_list': approve_refused_list,
@@ -719,7 +744,8 @@ def ApproveList(request):
 def ApproveInit(request):
     user = request.user
     sheet_id = request.GET['sheet_id']
-    print sheet_id
+    errcode = 0
+    msg = 'ok'
     try:
         publishsheet = models.PublishSheet.objects.get(id=sheet_id)
     except models.PublishSheet.DoesNotExist:
@@ -728,16 +754,92 @@ def ApproveInit(request):
         data = dict(code=errcode, msg=msg)
         return render_to_response('publish/publish_sheets.html', data)
     else:
-        tmp_dict = utils.serialize_instance(publishsheet)
-        service_objs = publishsheet.goservices.all()
-        gogroup = service_objs[0].group
-        tmp_dict.update({
-            'group_name': gogroup.name,
-            'services': ', '.join(service_objs.values_list('name', flat=True)),
-            'env': service_objs[0].get_env_display()
-        })
-        errcode = 0
-        msg = 'ok'
-        data = dict(code=errcode, msg=msg, approve_sheet=tmp_dict)
+        try:
+            publish_history = models.PublishApprovalHistory.objects.get(publish_sheet=publishsheet)
+        except models.PublishApprovalHistory.DoesNotExist:
+            # 从未审批过
+            tmp_dict = utils.serialize_instance(publishsheet)
+            service_objs = publishsheet.goservices.all()
+            gogroup = service_objs[0].group
+            tmp_dict.update({
+                'group_name': gogroup.name,
+                'services': ', '.join(service_objs.values_list('name', flat=True)),
+                'env': service_objs[0].get_env_display()
+            })
+        else:
+            # 被第一审批通过
+            first_approver = publish_history.first_approver
+            first_approve_time = publish_history.first_approve_time
+            # first_notices = publish_history.first_notices
+            approve_status = publish_history.approve_status
 
+            tmp_dict = utils.serialize_instance(publishsheet)
+            service_objs = publishsheet.goservices.all()
+            gogroup = service_objs[0].group
+            tmp_dict.update({
+                'group_name': gogroup.name,
+                'services': ', '.join(service_objs.values_list('name', flat=True)),
+                'env': service_objs[0].get_env_display(),
+                'first_approver': first_approver,
+                'first_approve_time': first_approve_time,
+                # 'first_notices': first_notices,
+                'approve_status': approve_status
+            })
+
+        data = dict(code=errcode, msg=msg, approve_sheet=tmp_dict)
         return render_to_response('publish/approve_sheet.html', data)
+
+
+@login_required
+def ApproveJudge(request):
+    user = request.user
+    publish_id = int(request.POST['publish_id'])
+    approve = request.POST['approve']
+    text = request.POST['text']
+    errcode = 0
+    msg = 'ok'
+    try:
+        publishsheet = models.PublishSheet.objects.get(id=publish_id)
+    except models.PublishSheet.DoesNotExist:
+        errcode = 500
+        msg = u'发布单不存在'
+        data = dict(code=errcode, msg=msg)
+        return HttpResponse(json.dumps(data), content_type='application/json')
+    else:
+        try:
+            publish_history = models.PublishApprovalHistory.objects.get(publish_sheet=publishsheet)
+        except models.PublishApprovalHistory.DoesNotExist:
+            # 从未审批过
+            publish_history = models.PublishApprovalHistory()
+            publish_history.publish_sheet = publishsheet
+            publish_history.approve_count = '1'
+            publish_history.approve_status = approve
+            publish_history.first_approver = user
+            publish_history.first_approve_time = datetime.now()
+            if approve == '1':
+                # publish_history.first_notices = text
+                publishsheet.status = '3'
+                publishsheet.save()
+            else:
+                publish_history.refuse_reason = text
+                publishsheet.status = '2'
+                publishsheet.save()
+            publish_history.save()
+        else:
+            # 被第一审批通过
+            publish_history.approve_count = '2'
+            publish_history.approve_status = approve
+            publish_history.second_approver = user
+            publish_history.second_approve_time = datetime.now()
+            if approve == '1':
+                # publish_history.first_notices = text
+                publishsheet.status = '3'
+                publishsheet.save()
+            else:
+                publish_history.refuse_reason = text
+                publishsheet.status = '2'
+                publishsheet.save()
+            publish_history.save()
+
+    data = dict(code=errcode, msg=msg)
+    return HttpResponse(json.dumps(data), content_type='application/json')

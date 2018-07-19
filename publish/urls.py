@@ -24,5 +24,6 @@ urlpatterns = patterns('',
                        url(r'^publishsheet/reason/$', PublishSheetRefuseReason, name='PublishSheetRefuseReason'),
 
                        url(r'^approve/list/$', ApproveList, name='ApproveList'),
-                       url(r'^approve/init/$', ApproveInit, name='ApproveInit'),
+                       url(r'^approve/init/$', ApproveInit, name='ApproveInit'),  # 单个审批单
+                       url(r'^approve/judge/$', ApproveJudge, name='ApproveJudge'),
                        )
