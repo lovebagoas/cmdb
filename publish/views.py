@@ -352,29 +352,83 @@ def PublishSheetList(request):
     approve_refused_list = []
     approve_passed_list = []
     for publish in publishsheets:
+        services_objs = publish.goservices.all().order_by('name')
+        services_str = ', '.join(services_objs.values_list('name', flat=True))
+        env = services_objs[0].get_env_display()
+        gogroup_obj = services_objs[0].group
+        level = publish.approval_level.get_name_display()
+        approve_level = publish.approval_level.name
+
+        if approve_level == '1':
+            first_str = ''
+            second_str = ''
+        elif approve_level == '2':
+            first_list = [owner.username for owner in publish.first_approver.all()]
+            first_str = ', '.join(first_list)
+            second_str = ''
+        else:
+            first_list = [owner.username for owner in publish.first_approver.all()]
+            first_str = ', '.join(first_list)
+            second_list = [owner.username for owner in publish.second_approver.all()]
+            second_str = ', '.join(second_list)
+
+        tmp_dict = utils.serialize_instance(publish)
+        if len(publish.sql) > 40:
+            tmp_dict['sql'] = utils.cut_str(publish.sql, 40)
+        if len(publish.consul_key) > 40:
+            tmp_dict['consul_key'] = utils.cut_str(publish.consul_key, 40)
+
+        tmp_dict.update({'id': publish.id, 'gogroup': gogroup_obj.name, 'services_str': services_str, 'env': env,
+                             'approve_level': approve_level, 'level': level, 'first_str': first_str, 'second_str': second_str, 'creator': publish.creator.username})
+
+        if user == publish.creator:
+            tmp_dict['can_publish'] = True
+        else:
+            tmp_dict['can_publish'] = False
+
+        # 判断是否超时
         publish_datetime_str = publish.publish_date + ' ' + publish.publish_time
         publish_datetime_format = time.strptime(publish_datetime_str, '%Y-%m-%d %H:%M')
         publish_datetime_int = time.mktime(publish_datetime_format)
         now_int = time.time()
-        if publish_datetime_int < now_int:
+        if publish_datetime_int <= now_int:
+            print 'out time ---- if start'
             if publish.status == '2' or publish.status == '4' or publish.status == '5' or publish.status == '6':
                 pass
             else:
                 # 超时
+                print 'publish.status : ', publish.status
+                print type(publish.status)
                 if publish.status == '1':
-                    if publish.approval_level == '1':
-                        # 无需审批，超时未发布
-                        publish.status = '5'
-                        publish.save()
+                    # 状态为审批中
+                    print 'publish.id : ', publish.id
+                    if publish.approval_level.name == '1':
+                        # 无需审批的单子
+                        if publish_datetime_int + 900 < now_int:
+                            # 超时15分钟未发布
+                            publish.status = '5'
+                            publish.save()
+                        else:
+                            print 'here----can_publish'
+                            # 超时15分钟之内，可以发布
+                            tmp_dict['can_publish'] = True
+                            approve_passed_list.append(tmp_dict)
                     else:
-                        # 超时未审批
+                        # 一级审批和二级审批的单子，超时未审批
                         publish.status = '6'
                         publish.save()
                 else:
-                    if publish.approval_level == '2':
-                        # 一级审批, 超时未发布
-                        publish.status = '5'
-                        publish.save()
+                    # 状态为审批通过
+                    if publish.approval_level.name == '2':
+                        # 一级审批
+                        if publish_datetime_int + 900 < now_int:
+                            # 超时15分钟未发布
+                            publish.status = '5'
+                            publish.save()
+                        else:
+                            # 超时15分钟之内，可以发布
+                            tmp_dict['can_publish'] = True
+                            approve_passed_list.append(tmp_dict)
                     else:
                         # 二级审批
                         try:
@@ -388,45 +442,16 @@ def PublishSheetList(request):
                                 publish.status = '6'
                                 publish.save()
                             else:
-                                # 超时未发布
-                                publish.status = '5'
-                                publish.save()
+                                if publish_datetime_int + 900 < now_int:
+                                    # 超时15分钟未发布
+                                    publish.status = '5'
+                                    publish.save()
+                                else:
+                                    # 超时15分钟之内，可以发布
+                                    tmp_dict['can_publish'] = True
+                                    approve_passed_list.append(tmp_dict)
         else:
-            services_objs = publish.goservices.all().order_by('name')
-            services_str = ', '.join(services_objs.values_list('name', flat=True))
-            env = services_objs[0].get_env_display()
-            gogroup_obj = services_objs[0].group
-            level = publish.approval_level.get_name_display()
-            approve_level = publish.approval_level.name
-
-            if approve_level == '1':
-                first_str = ''
-                second_str = ''
-            elif approve_level == '2':
-                first_list = [owner.username for owner in publish.first_approver.all()]
-                first_str = ', '.join(first_list)
-                second_str = ''
-            else:
-                first_list = [owner.username for owner in publish.first_approver.all()]
-                first_str = ', '.join(first_list)
-                second_list = [owner.username for owner in publish.second_approver.all()]
-                second_str = ', '.join(second_list)
-
-            tmp_dict = utils.serialize_instance(publish)
-
-            if user == publish.creator:
-                tmp_dict['can_publish'] = True
-            else:
-                tmp_dict['can_publish'] = False
-
-            if len(publish.sql) > 40:
-                tmp_dict['sql'] = utils.cut_str(publish.sql, 40)
-            if len(publish.consul_key) > 40:
-                tmp_dict['consul_key'] = utils.cut_str(publish.consul_key, 40)
-
-            tmp_dict.update({'id': publish.id, 'gogroup': gogroup_obj.name, 'services_str': services_str, 'env': env,
-                             'approve_level': approve_level, 'level': level, 'first_str': first_str, 'second_str': second_str, 'creator': publish.creator.username})
-
+            tmp_dict['can_publish'] = False
             if publish.approval_level.name == '1':
                 # 无需审批
                 approve_passed_list.append(tmp_dict)
@@ -465,6 +490,7 @@ def PublishSheetList(request):
 
 @login_required
 def PublishSheetDoneList(request):
+    # 已完成 & 超时未审批 & 超时未发布的发布单
     publishsheets = models.PublishSheet.objects.all().order_by('publish_date', 'publish_time')
 
     done_list = []
@@ -734,9 +760,10 @@ def ApproveList(request):
         publish_datetime_int = time.mktime(publish_datetime_format)
         now_int = time.time()
         if publish_datetime_int < now_int and publish.status == '1':
-            # 超时未审批
-            publish.status = '6'
-            publish.save()
+            if publish.approval_level.name != '1':
+                # 超时未审批
+                publish.status = '6'
+                publish.save()
         else:
             approve_level = publish.approval_level.name
             services_objs = publish.goservices.all().order_by('name')
