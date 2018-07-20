@@ -129,7 +129,7 @@
 
                 <div class="text-center">
                     <button class="btn btn-sm btn-primary m-t-n-xs" type="submit"
-                            id="create_level">保存
+                            id="create_level">配置
                     </button>
                 </div>
             </form>
@@ -152,7 +152,8 @@
                         <p>【{{ level.timeslot.get_is_global_display }}】<a class="close-li pull-right"
                                                                           style="color: #c4c4c4"
                                                                           href="javascript: void(0);"
-                                                                          onclick="delete_level('{{ level.timeslot.id }}')"><i
+                                                                          data-toggle="modal"
+                                                                          data-target="#deleteLevelModal"><i
                                 class="fa fa-times"></i></a></p>
                         <p>{{ level.timeslot.approval_level }} : {{ level.timeslot.get_start_of_week_display }}
                             ~ {{ level.timeslot.get_end_of_week_display }}&nbsp;&nbsp;&nbsp;&nbsp;{{ level.timeslot.start_time }}
@@ -168,6 +169,33 @@
                             详情
                         </a>
                     </li>
+
+                    <div class="modal inmodal fade" id="deleteLevelModal" tabindex="-1"
+                         role="dialog"
+                         aria-labelledby="addModalLabel"
+                         aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content animated fadeIn">
+                                <div class="modal-header">
+                                    <button type="button" class="close"
+                                            data-dismiss="modal"><span
+                                            aria-hidden="true">×</span><span
+                                            class="sr-only">Close</span></button>
+                                    <i class="fa fa-times modal-icon"
+                                       style="color: red"></i>
+                                    <h4 class="modal-title" id="minion_old">确认删除</h4>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-white"
+                                            data-dismiss="modal">关闭
+                                    </button>
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal"
+                                            id="deleteLevelButton" onclick="delete_level('{{ level.timeslot.id }}')">删除
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 {% endfor %}
             </ul>
         </div>

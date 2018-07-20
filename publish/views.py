@@ -40,6 +40,7 @@ def initProject(request):
 @login_required
 def createProject(request):
     user = request.user
+    ip = request.META['REMOTE_ADDR']
     project_select_list = request.POST.getlist('project_select_list')
     project_id_list = [int(project_id) for project_id in project_select_list]
     owner_select_list = request.POST.getlist('owner_select_list')
@@ -81,6 +82,8 @@ def createProject(request):
                     for mailgroup in mailgroup_list:
                         project_obj.mail_group.add(mailgroup)
 
+                asset_utils.logs(user.username, ip, 'create project info', 'success')
+
             else:
                 print 'already exist'
                 errcode = 500
@@ -88,8 +91,8 @@ def createProject(request):
                 data = dict(code=errcode, msg=msg)
                 return HttpResponse(json.dumps(data), content_type='application/json')
 
-    data = dict(code=errcode, msg=msg)
-    return HttpResponse(json.dumps(data), content_type='application/json')
+        data = dict(code=errcode, msg=msg)
+        return HttpResponse(json.dumps(data), content_type='application/json')
 
 
 @login_required
@@ -97,6 +100,7 @@ def projectDelete(request):
     errcode = 0
     msg = 'ok'
     user = request.user
+    ip = request.META['REMOTE_ADDR']
     projectinfo_id = int(request.POST['projectinfo_id'])
 
     try:
@@ -113,9 +117,11 @@ def projectDelete(request):
 
         if user == project_obj.creator:
             project_obj.delete()
+            asset_utils.logs(user.username, ip, 'delete project info', 'success')
         else:
             owner_list = project_obj.owner.all()
             if user in owner_list:
+                asset_utils.logs(user.username, ip, 'delete project info', 'success')
                 project_obj.delete()
             else:
                 errcode = 500
@@ -188,6 +194,7 @@ def LevelCreate(request):
     errcode = 0
     msg = 'ok'
     user = request.user
+    ip = request.META['REMOTE_ADDR']
 
     radio = request.POST['radio']
     level_list = request.POST.getlist('level_list')
@@ -202,6 +209,8 @@ def LevelCreate(request):
         return HttpResponse(json.dumps(data), content_type='application/json')
     else:
         for project_obj in project_objs:
+            first_approver_objs = project_obj.first_approver.all()
+            second_approver_objs = project_obj.second_approver.all()
             if radio == '1':
                 print 'radio 1'
                 old_time_objs = project_obj.timeslot_level.all()
@@ -212,6 +221,21 @@ def LevelCreate(request):
                     start_time = level[2]
                     end_time = level[3]
                     approval_level = level[4]
+
+                    if approval_level == '2' and not first_approver_objs:
+                        errcode = 500
+                        msg = u'项目 {0} 无一级审批人'.format(project_obj.group.name)
+                        data = dict(code=errcode, msg=msg)
+                        asset_utils.logs(user.username, ip, 'create project--approval level, no first approver', 'failed')
+                        return HttpResponse(json.dumps(data), content_type='application/json')
+                    if approval_level == '3' and not second_approver_objs:
+                        errcode = 500
+                        msg = u'项目 {0} 无二级审批人'.format(project_obj.group.name)
+                        data = dict(code=errcode, msg=msg)
+                        asset_utils.logs(user.username, ip, 'create project--approval level, no second approver',
+                                         'failed')
+                        return HttpResponse(json.dumps(data), content_type='application/json')
+
                     try:
                         approval_level_obj = models.ApprovalLevel.objects.get(name=approval_level)
                     except models.ApprovalLevel.DoesNotExist:
@@ -229,16 +253,35 @@ def LevelCreate(request):
                         print time_obj
                         if time_obj not in old_time_objs:
                             project_obj.timeslot_level.add(time_obj[0])
+                            asset_utils.logs(user.username, ip, 'create project--approval level',
+                                             'success')
             else:
                 print 'radio 2'
                 old_time_objs = project_obj.timeslot_level.all()
-                print 'old_time_objs : ', old_time_objs
-                level_id_list = [int(level_id) for level_id in level_list]
-                time_objs = models.TimeSlotLevel.objects.filter(id__in=level_id_list)
+                print 'LevelCreate--old_time_objs : ', old_time_objs
+                timeslot_id_list = [int(level_id) for level_id in level_list]
+                time_objs = models.TimeSlotLevel.objects.filter(id__in=timeslot_id_list)
                 for time_obj in time_objs:
-                    print 'time_obj : ', time_obj
+                    if time_obj.approval_level.name == '2' and not first_approver_objs:
+                        errcode = 500
+                        msg = u'项目 {0} 无一级审批人'.format(project_obj.group.name)
+                        data = dict(code=errcode, msg=msg)
+                        asset_utils.logs(user.username, ip, 'create project--approval level, no first approver',
+                                         'failed')
+                        return HttpResponse(json.dumps(data), content_type='application/json')
+                    if time_obj.approval_level.name == '3' and not second_approver_objs:
+                        errcode = 500
+                        msg = u'项目 {0} 无二级审批人'.format(project_obj.group.name)
+                        data = dict(code=errcode, msg=msg)
+                        asset_utils.logs(user.username, ip, 'create project--approval level, no second approver',
+                                         'failed')
+                        return HttpResponse(json.dumps(data), content_type='application/json')
+
+                    print 'LevelCreate--time_obj : ', time_obj
                     if time_obj not in old_time_objs:
-                        print 'add'
+                        print 'LevelCreate--add'
+                        asset_utils.logs(user.username, ip, 'create project--approval level',
+                                         'success')
                         project_obj.timeslot_level.add(time_obj)
 
     data = dict(code=errcode, msg=msg)
@@ -250,6 +293,7 @@ def LevelDelete(request):
     errcode = 0
     msg = 'ok'
     user = request.user
+    ip = request.META['REMOTE_ADDR']
     timeslot_id = int(request.POST['timeslot_id'])
     print 'timeslot_id : ', timeslot_id
 
@@ -259,14 +303,21 @@ def LevelDelete(request):
         errcode = 500
         msg = u'所选项目审批级别不存在'
     else:
-        if timeslot_obj.creator:
-            if timeslot_obj.creator == user:
-                timeslot_obj.delete()
-            else:
-                errcode = 500
-                msg = u'你不是创建人，不能删除'
-        else:
-            timeslot_obj.delete()
+        projectinfo_objs = timeslot_obj.project_timeslotlevel.all()
+        for projectinfo in projectinfo_objs:
+            projectinfo.timeslot_level.remove(timeslot_obj)
+        asset_utils.logs(user.username, ip, 'delete project--approval level', 'success')
+        #
+        # if timeslot_obj.creator:
+        #     if timeslot_obj.creator == user:
+        #         asset_utils.logs(user.username, ip, 'delete project--approval level', 'success')
+        #         timeslot_obj.delete()
+        #     else:
+        #         errcode = 500
+        #         msg = u'你不是创建人，不能删除'
+        # else:
+        #     asset_utils.logs(user.username, ip, 'delete project--approval level', 'success')
+        #     timeslot_obj.delete()
 
     data = dict(code=errcode, msg=msg)
     return HttpResponse(json.dumps(data), content_type='application/json')
@@ -289,6 +340,7 @@ def templateCreate(request):
     errcode = 0
     msg = 'ok'
     user = request.user
+    ip = request.META['REMOTE_ADDR']
     weekday_start = request.POST['weekday_start']
     weekday_end = request.POST['weekday_end']
     time_start = request.POST['time_start']
@@ -308,6 +360,7 @@ def templateCreate(request):
             models.TimeSlotLevel.objects.create(start_of_week=weekday_start, end_of_week=weekday_end,
                                                 start_time=time_start, end_time=time_end, approval_level=level_obj, is_global='2',
                                                 creator=user)
+            asset_utils.logs(user.username, ip, 'create approval level template', 'success')
         else:
             errcode = 500
             msg = u'相同【时间段<--->级别】已存在'
@@ -320,6 +373,7 @@ def templateDelete(request):
     errcode = 0
     msg = 'ok'
     user = request.user
+    ip = request.META['REMOTE_ADDR']
     timeslot_id = int(request.POST['timeslot_id'])
 
     try:
@@ -330,11 +384,13 @@ def templateDelete(request):
     else:
         if timeslot_obj.creator:
             if timeslot_obj.creator == user:
+                asset_utils.logs(user.username, ip, 'delete approval level template', 'success')
                 timeslot_obj.delete()
             else:
                 errcode = 500
                 msg = u'你不是创建人，不能删除'
         else:
+            asset_utils.logs(user.username, ip, 'delete approval level template', 'success')
             timeslot_obj.delete()
 
     data = dict(code=errcode, msg=msg)
@@ -593,6 +649,7 @@ def createPublishSheet(request):
     errcode = 0
     msg = 'ok'
     user = request.user
+    ip = request.META['REMOTE_ADDR']
     project_name = request.POST['project_name']
     env_id = request.POST['env_id']
     tapd_url = request.POST['tapd_url']
@@ -705,6 +762,8 @@ def createPublishSheet(request):
             publishsheet_obj.approval_level = models.ApprovalLevel.objects.get(name='1')
 
         publishsheet_obj.save()
+        asset_utils.logs(user.username, ip, 'create publish sheet', 'success')
+        print '^^^^^save publishsheet_obj ok ----', publishsheet_obj.id
 
         if projectinfo_obj:
             # 添加审批人
@@ -724,6 +783,7 @@ def PublishSheetDelete(request):
     errcode = 0
     msg = 'ok'
     user = request.user
+    ip = request.META['REMOTE_ADDR']
     sheet_id = int(request.POST['sheet_id'])
 
     try:
@@ -735,12 +795,14 @@ def PublishSheetDelete(request):
         if publish_obj.creator:
             if publish_obj.creator == user:
                 publish_obj.delete()
+                asset_utils.logs(user.username, ip, 'delete publish sheet', 'success')
             else:
                 errcode = 500
                 msg = u'你不是创建人，不能删除'
         else:
             print 'no creator'
             publish_obj.delete()
+            asset_utils.logs(user.username, ip, 'delete publish sheet', 'success')
 
     data = dict(code=errcode, msg=msg)
     return HttpResponse(json.dumps(data), content_type='application/json')
@@ -852,7 +914,6 @@ def ApproveList(request):
 
 @login_required
 def ApproveInit(request):
-    user = request.user
     sheet_id = request.GET['sheet_id']
     errcode = 0
     msg = 'ok'
@@ -903,6 +964,7 @@ def ApproveInit(request):
 @login_required
 def ApproveJudge(request):
     user = request.user
+    ip = request.META['REMOTE_ADDR']
     publish_id = int(request.POST['publish_id'])
     approve = request.POST['approve']
     text = request.POST['text']
@@ -935,6 +997,7 @@ def ApproveJudge(request):
                 publishsheet.status = '2'
                 publishsheet.save()
             publish_history.save()
+            asset_utils.logs(user.username, ip, 'first approve publish sheet', 'success')
         else:
             # 被第一审批通过
             publish_history.approve_count = '2'
@@ -950,6 +1013,7 @@ def ApproveJudge(request):
                 publishsheet.status = '2'
                 publishsheet.save()
             publish_history.save()
+            asset_utils.logs(user.username, ip, 'second approve publish sheet', 'success')
 
     data = dict(code=errcode, msg=msg)
     return HttpResponse(json.dumps(data), content_type='application/json')
@@ -1085,7 +1149,7 @@ def StartPublish(request):
 
         result = []
         for svc in services:
-            rst = Publish.deployGo(goproject_name, svc, request.user, ip, tower_url, phone_number)
+            rst = Publish.deployGo(goproject_name, svc, request.user.username, ip, tower_url, phone_number)
             result.extend(rst)
 
             # break once deploy failed
@@ -1095,11 +1159,13 @@ def StartPublish(request):
                 break
 
         if publish_ok:
-            # publishsheet.status = '4'
-            # publishsheet.save()
+            publishsheet.status = '4'
+            publishsheet.save()
             print 'publish ok'
+            asset_utils.logs(user.username, ip, 'deploy publish sheet', 'success')
         else:
             print 'publish failed'
+            asset_utils.logs(user.username, ip, 'deploy publish sheet', 'failed')
 
     data = dict(code=errcode, msg=msg)
     return HttpResponse(json.dumps(data), content_type='application/json')

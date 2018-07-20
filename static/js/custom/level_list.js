@@ -239,6 +239,7 @@ $("#create_level").click(function () {
             }
             else {
                 alert(result.msg);
+                window.location.reload();
                 $("#create_projectinfo").removeAttr("disabled");
             }
             $("#page_loading").hide();
@@ -264,7 +265,7 @@ function delete_level(timeslot_id) {
         traditional: true,
         beforeSend: function () {
             // 禁用按钮防止重复提交
-            $("#create_projectinfo").attr({disabled: "disabled"});
+            $("#deleteLevelButton").attr({disabled: "disabled"});
             $("#page_loading").show();
         },
         success: function (result) {
@@ -273,13 +274,15 @@ function delete_level(timeslot_id) {
             }
             else {
                 alert(result.msg);
-                $("#create_projectinfo").removeAttr("disabled");
             }
+
+            $("#deleteLevelButton").removeAttr("disabled");
+            $("#deleteLevelModal").modal('hide');
             $("#page_loading").hide();
         },
         error: function () {
             alert('失败');
-            $("#create_projectinfo").removeAttr("disabled");
+            $("#deleteLevelButton").removeAttr("disabled");
             $("#page_loading").hide();
         }
     });

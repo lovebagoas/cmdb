@@ -42,7 +42,7 @@
                                     <td class="text-center"> {{ info.remote_ip }} </td>
                                     <td class="text-center"> {{ info.goAction }} </td>
                                     <td class="text-center"> {{ info.result }} </td>
-                                    <td class="text-center"> {{ info.datetime }} </td>
+                                    <td class="text-center"> {{ info.datetime|date:'Y-m-d H:i' }} </td>
                                 </tr>
                             {% endfor %}
                             </tbody>

@@ -88,7 +88,7 @@ function delete_publishsheet(sheet_id) {
         traditional: true,
         beforeSend: function () {
             // 禁用按钮防止重复提交
-            $("#page_loading").show();
+            $("#deleteSheetButton").attr({disabled: "disabled"});
         },
         success: function (result) {
             if (result.code === 0) {
@@ -97,11 +97,14 @@ function delete_publishsheet(sheet_id) {
             else {
                 alert(result.msg);
             }
+            $("#deleteSheetButton").removeAttr("disabled");
+            $("#deleteSheetModal").modal('hide');
             $("#page_loading").hide();
         },
         error: function () {
             alert('失败');
             $("#page_loading").hide();
+            $("#deleteSheetButton").removeAttr("disabled");
         }
     });
 }
@@ -139,7 +142,6 @@ function sheet_detail(sheet_id) {
 }
 
 function start_publish(sheet_id) {
-    alert(sheet_id);
     let url = '/asset/publishsheet/publish/start/';
     let data = {
         'sheet_id': sheet_id

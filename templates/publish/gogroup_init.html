@@ -87,7 +87,7 @@
 
                                         <div class="text-center">
                                             <button class="btn btn-sm btn-primary m-t-n-xs" type="submit"
-                                                    id="create_projectinfo">保存
+                                                    id="create_projectinfo">初始化
                                             </button>
                                         </div>
                                     </form>
@@ -110,9 +110,9 @@
                                                 <p>项目： {{ projectinfo.project_name }} <a class="close-li pull-right"
                                                                                          style="color: #c4c4c4"
                                                                                          href="javascript: void(0);"
-                                                                                         onclick="delete_projectinfo('{{ projectinfo.project_id }}')"><i
+                                                                                         data-toggle="modal"
+                                                                                         data-target="#deleteProjectModal"><i
                                                         class="fa fa-times"></i></a></p>
-
                                                 <p>负责人：
                                                     {% for owner in projectinfo.owner_list %}
                                                         {{ owner }}&nbsp;
@@ -141,6 +141,35 @@
                                                     </p>
                                                 {% endif %}
                                             </li>
+                                            <div class="modal inmodal fade" id="deleteProjectModal" tabindex="-1"
+                                                 role="dialog"
+                                                 aria-labelledby="addModalLabel"
+                                                 aria-hidden="true">
+                                                <div class="modal-dialog modal-lg">
+                                                    <div class="modal-content animated fadeIn">
+                                                        <div class="modal-header">
+                                                            <button type="button" class="close"
+                                                                    data-dismiss="modal"><span
+                                                                    aria-hidden="true">×</span><span
+                                                                    class="sr-only">Close</span></button>
+                                                            <i class="fa fa-times modal-icon"
+                                                               style="color: red"></i>
+                                                            <h4 class="modal-title" id="minion_old">确认删除</h4>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-white"
+                                                                    data-dismiss="modal">关闭
+                                                            </button>
+                                                            <button type="button" class="btn btn-danger"
+                                                                    data-dismiss="modal"
+                                                                    id="deleteProjectButton"
+                                                                    onclick="delete_projectinfo('{{ projectinfo.project_id }}')">
+                                                                删除
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         {% endfor %}
                                     </ul>
                                 </div>
@@ -220,14 +249,16 @@
                                         <div class="row">
                                             <div class="col-lg-6">
                                                 <div class="form-group">
-                                                    <span style="color: red;">*</span><label>&nbsp;SQL (若有SQL需要执行，请让DBA执行后再发布)</label>
+                                                    <span style="color: red;">*</span><label>&nbsp;SQL
+                                                    (若有SQL需要执行，请让DBA执行后再发布)</label>
                                                     <textarea type="text" class="form-control" id="sql"
                                                               rows="5"></textarea>
                                                 </div>
                                             </div>
                                             <div class="col-lg-6">
                                                 <div class="form-group">
-                                                    <span style="color: red;">*</span><label>&nbsp;CONSUL KEY (若有consul key添加或修改，请让运维操作后再发布)</label>
+                                                    <span style="color: red;">*</span><label>&nbsp;CONSUL KEY (若有consul
+                                                    key添加或修改，请让运维操作后再发布)</label>
                                                     <textarea type="text" class="form-control" id="consul_key"
                                                               rows="5"></textarea>
                                                 </div>
@@ -240,7 +271,8 @@
                                                 <div class="form-group">
                                                     <span style="color: red;">*</span><label>&nbsp;发布日期</label>
                                                     <div class="input-group date" data-provide="datepicker">
-                                                        <input type="text" id="datepicker" class="form-control" autocomplete="off">
+                                                        <input type="text" id="datepicker" class="form-control"
+                                                               autocomplete="off">
                                                         <div class="input-group-addon">
                                                             <span class="glyphicon glyphicon-th"></span>
                                                         </div>
@@ -311,6 +343,10 @@
 
         </div>
     </div>
+
+
+
+
     <script src="/static/js/custom/gogroup_init.js"></script>
 
     <style>

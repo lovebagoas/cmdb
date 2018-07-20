@@ -75,7 +75,7 @@ $("#create_project_template").click(function () {
 });
 
 function delete_timeslot(timeslot_id) {
-    let url = '/asset/project/level/delete/';
+    let url = '/asset/project/template/delete/';
     let data = {
         'timeslot_id': timeslot_id,
     };
@@ -87,7 +87,7 @@ function delete_timeslot(timeslot_id) {
         traditional: true,
         beforeSend: function () {
             // 禁用按钮防止重复提交
-            $("#create_projectinfo").attr({disabled: "disabled"});
+            $("#deleteTemplateButton").attr({disabled: "disabled"});
             $("#page_loading").show();
         },
         success: function (result) {
@@ -96,13 +96,14 @@ function delete_timeslot(timeslot_id) {
             }
             else {
                 alert(result.msg);
-                $("#create_projectinfo").removeAttr("disabled");
             }
+            $("#deleteTemplateButton").removeAttr("disabled");
+            $("#deleteTemplateModal").modal('hide');
             $("#page_loading").hide();
         },
         error: function () {
             alert('失败');
-            $("#create_projectinfo").removeAttr("disabled");
+            $("#deleteTemplateButton").removeAttr("disabled");
             $("#page_loading").hide();
         }
     });

@@ -157,10 +157,10 @@ $("#create_publishsheet").click(function () {
         return false;
     }
 
-    if (tapd_url.match("tower.im") || tapd_url.match("tapd.cn")){
+    if (tapd_url.match("tower.im") || tapd_url.match("tapd.cn")) {
         console.log('url ok');
     }
-    else{
+    else {
         alert('TAPD URL格式不正确');
         return false;
     }
@@ -293,7 +293,7 @@ $("#approvalLevelList").click(function () {
     document.getElementById('createTab').style.display = 'none';
     document.getElementById('doneSheet').style.display = 'none';
     document.getElementById('initTemplate').style.display = 'none';
-     $("#projectInfo").removeClass("active");
+    $("#projectInfo").removeClass("active");
     $("#tab-1").removeClass("active");
     $("#publishSheet").removeClass("active");
     $("#tab-2").removeClass("active");
@@ -343,20 +343,21 @@ function delete_projectinfo(projectinfo_id) {
         traditional: true,
         beforeSend: function () {
             // 禁用按钮防止重复提交
-            $("#page_loading").show();
+            $("#deleteProjectButton").attr({disabled: "disabled"});
         },
         success: function (result) {
             if (result.code === 0) {
-                $("#"+projectinfo_id).remove();
+                $("#" + projectinfo_id).remove();
             }
             else {
                 alert(result.msg);
             }
-            $("#page_loading").hide();
+            $("#deleteProjectButton").removeAttr("disabled");
+            $("#deleteProjectModal").modal('hide');
         },
         error: function () {
             alert('失败');
-            $("#page_loading").hide();
+            $("#deleteProjectButton").removeAttr("disabled");
         }
     });
 }
