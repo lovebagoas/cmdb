@@ -6,6 +6,7 @@ import time
 from django.shortcuts import render, HttpResponse, render_to_response
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from publish import models
 from publish import utils
@@ -399,6 +400,9 @@ def templateDelete(request):
 
 @login_required
 def PublishSheetList(request):
+    page1 = request.GET.get('page1', 1)
+    page2 = request.GET.get('page2', 1)
+    page3 = request.GET.get('page3', 1)
     errcode = 0
     msg = 'ok'
     user = request.user
@@ -448,13 +452,10 @@ def PublishSheetList(request):
         publish_datetime_int = time.mktime(publish_datetime_format)
         now_int = time.time()
         if publish_datetime_int <= now_int:
-            print 'out time ---- if start'
             if publish.status == '2' or publish.status == '4' or publish.status == '5' or publish.status == '6':
                 pass
             else:
                 # 超时
-                print 'publish.status : ', publish.status
-                print type(publish.status)
                 if publish.status == '1':
                     # 状态为审批中
                     print 'publish.id : ', publish.id
@@ -537,6 +538,31 @@ def PublishSheetList(request):
                             tobe_approved_list.append(tmp_dict)
                         else:
                             approve_passed_list.append(tmp_dict)
+
+    # # 分页
+    # paginator = Paginator(tobe_approved_list, 2)
+    # try:
+    #     tobe_approved_list = paginator.page(page1)
+    # except PageNotAnInteger:
+    #     tobe_approved_list = paginator.page(1)
+    # except EmptyPage:
+    #     tobe_approved_list = paginator.page(paginator.num_pages)
+    #
+    # paginator = Paginator(approve_refused_list, 2)
+    # try:
+    #     approve_refused_list = paginator.page(page2)
+    # except PageNotAnInteger:
+    #     approve_refused_list = paginator.page(1)
+    # except EmptyPage:
+    #     approve_refused_list = paginator.page(paginator.num_pages)
+    #
+    # paginator = Paginator(approve_passed_list, 2)
+    # try:
+    #     approve_passed_list = paginator.page(page3)
+    # except PageNotAnInteger:
+    #     approve_passed_list = paginator.page(1)
+    # except EmptyPage:
+    #     approve_passed_list = paginator.page(paginator.num_pages)
 
     data = dict(code=errcode, msg=msg, tobe_approved_list=tobe_approved_list, approve_refused_list=approve_refused_list,
                 approve_passed_list=approve_passed_list)
@@ -673,7 +699,7 @@ def createPublishSheet(request):
         try:
             projectinfo_obj = models.ProjectInfo.objects.get(group=gogroup_obj)
         except models.ProjectInfo.DoesNotExist:
-            print 'no project info of this gogroup'
+            print 'no project_info of this gogroup: ', project_name
             projectinfo_obj = None
 
         publishsheet_obj = models.PublishSheet()
@@ -714,9 +740,6 @@ def createPublishSheet(request):
             for template_obj in template_objs:
                 start_week_int = int(template_obj.start_of_week)
                 end_week_int = int(template_obj.end_of_week)
-                print 'template  start_week_int : ', start_week_int
-                print 'template  end_week_int : ', end_week_int
-                print 'template  publish_week : ', publish_week
                 if start_week_int <= publish_week <= end_week_int:
                     publish_time_format = time.strptime(str(publish_date) + ' ' + str(publish_time), '%Y-%m-%d %H:%M')
                     start_time_format = time.strptime(str(publish_date) + ' ' + str(template_obj.start_time),
@@ -729,7 +752,6 @@ def createPublishSheet(request):
                         end_time_int = end_time_int + 86400
                     if start_time_int <= publish_time_int <= end_time_int:
                         publishsheet_obj.approval_level = template_obj.approval_level
-                        print 'template done'
                         slot = True
                         break
 
@@ -758,12 +780,11 @@ def createPublishSheet(request):
                                 break
 
         if not slot:
-            print 'no need done'
             publishsheet_obj.approval_level = models.ApprovalLevel.objects.get(name='1')
 
         publishsheet_obj.save()
         asset_utils.logs(user.username, ip, 'create publish sheet', 'success')
-        print '^^^^^save publishsheet_obj ok ----', publishsheet_obj.id
+        print '^^^^^save publishsheet_obj ok，id ----', publishsheet_obj.id
 
         if projectinfo_obj:
             # 添加审批人

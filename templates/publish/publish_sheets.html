@@ -68,7 +68,17 @@
                         </div>
                     </div>
                 {% endfor %}
+
             </ul>
+{#            <ul class="pager">#}
+{#                {% if tobe_approved_list.has_previous %}#}
+{#                    <li><a href="?page1={{ tobe_approved_list.previous_page_number }}">Previous</a></li>#}
+{#                {% endif %}#}
+{#                <li>Page {{ tobe_approved_list.number }} of {{ tobe_approved_list.paginator.num_pages }}.</li>#}
+{#                {% if tobe_approved_list.has_next %}#}
+{#                    <li><a href="?page1={{ tobe_approved_list.next_page_number }}">Next</a></li>#}
+{#                {% endif %}#}
+{#            </ul>#}
 
         </div>
     </div>
@@ -112,6 +122,15 @@
                     </li>
                 {% endfor %}
             </ul>
+{#            <ul class="pager">#}
+{#                {% if approve_refused_list.has_previous %}#}
+{#                    <li><a href="?page2={{ approve_refused_list.previous_page_number }}">Previous</a></li>#}
+{#                {% endif %}#}
+{#                <li>Page {{ approve_refused_list.number }} of {{ approve_refused_list.paginator.num_pages }}.</li>#}
+{#                {% if approve_refused_list.has_next %}#}
+{#                    <li><a href="?page2={{ approve_refused_list.next_page_number }}">Next</a></li>#}
+{#                {% endif %}#}
+{#            </ul>#}
         </div>
     </div>
 </div>
@@ -163,6 +182,15 @@
                     </li>
                 {% endfor %}
             </ul>
+{#            <ul class="pager">#}
+{#                {% if approve_passed_list.has_previous %}#}
+{#                    <li><a href="?page3={{ approve_passed_list.previous_page_number }}">Previous</a></li>#}
+{#                {% endif %}#}
+{#                <li>Page {{ approve_passed_list.number }} of {{ approve_passed_list.paginator.num_pages }}.</li>#}
+{#                {% if approve_passed_list.has_next %}#}
+{#                    <li><a href="?page3={{ approve_passed_list.next_page_number }}">Next</a></li>#}
+{#                {% endif %}#}
+{#            </ul>#}
         </div>
     </div>
 </div>
