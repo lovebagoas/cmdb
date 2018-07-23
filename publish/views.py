@@ -308,17 +308,17 @@ def LevelDelete(request):
         for projectinfo in projectinfo_objs:
             projectinfo.timeslot_level.remove(timeslot_obj)
         asset_utils.logs(user.username, ip, 'delete project--approval level', 'success')
-        #
-        # if timeslot_obj.creator:
-        #     if timeslot_obj.creator == user:
-        #         asset_utils.logs(user.username, ip, 'delete project--approval level', 'success')
-        #         timeslot_obj.delete()
-        #     else:
-        #         errcode = 500
-        #         msg = u'你不是创建人，不能删除'
-        # else:
-        #     asset_utils.logs(user.username, ip, 'delete project--approval level', 'success')
-        #     timeslot_obj.delete()
+
+        if timeslot_obj.creator:
+            if timeslot_obj.creator == user:
+                asset_utils.logs(user.username, ip, 'delete project--approval level', 'success')
+                timeslot_obj.delete()
+            else:
+                errcode = 500
+                msg = u'你不是创建人，不能删除'
+        else:
+            asset_utils.logs(user.username, ip, 'delete project--approval level', 'success')
+            timeslot_obj.delete()
 
     data = dict(code=errcode, msg=msg)
     return HttpResponse(json.dumps(data), content_type='application/json')
