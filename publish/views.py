@@ -141,7 +141,7 @@ def LevelList(request):
     for timeslot in timeslot_objs:
         project_list = timeslot.project_timeslotlevel.all().order_by('group__name')
         if project_list:
-            level_list.append({'timeslot': timeslot, 'project_list': project_list})
+            level_list.append({'timeslot': timeslot, 'project_list': project_list, 'creator': timeslot.creator.username})
 
     return render(request, 'publish/level_list.html', {'level_list': level_list, 'project_objs': project_objs})
 
