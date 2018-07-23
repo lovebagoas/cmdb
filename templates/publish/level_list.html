@@ -155,14 +155,15 @@
                                                                           data-toggle="modal"
                                                                           data-target="#deleteLevelModal"><i
                                 class="fa fa-times"></i></a></p>
-                        <p>{{ level.timeslot.approval_level }} : {{ level.timeslot.get_start_of_week_display }}
-                            ~ {{ level.timeslot.get_end_of_week_display }}&nbsp;&nbsp;&nbsp;&nbsp;{{ level.timeslot.start_time }}
-                            ~ {{ level.timeslot.end_time }}</p>
+                        
                         <p>项目：
                             {% for project in level.project_list %}
                                 {{ project.group.name }}
                                 &nbsp; {% endfor %}
                         </p>
+                        <p>{{ level.timeslot.approval_level }} : {{ level.timeslot.get_start_of_week_display }}
+                            ~ {{ level.timeslot.get_end_of_week_display }}&nbsp;&nbsp;&nbsp;&nbsp;{{ level.timeslot.start_time }}
+                            ~ {{ level.timeslot.end_time }}</p>
                         <p>创建人：{{ level.creator }}</p>
 
                         <a data-toggle="modal" data-target="#levelDetailModal" class="pull-right btn btn-xs btn-primary"
