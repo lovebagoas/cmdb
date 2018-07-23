@@ -30,6 +30,7 @@ def initProject(request):
             'mailgroup_list': [owner.email for owner in projectinfo.mail_group.all()],
             'first_list': [owner.username for owner in projectinfo.first_approver.all()],
             'second_list': [owner.username for owner in projectinfo.second_approver.all()],
+            'creator': projectinfo.creator.username,
         }
         project_list.append(tmp_dict)
 
@@ -315,7 +316,7 @@ def LevelDelete(request):
                 timeslot_obj.delete()
             else:
                 errcode = 500
-                msg = u'你不是创建人，不能删除'
+                msg = u'你不是此审批级别创建人，不能删除'
         else:
             asset_utils.logs(user.username, ip, 'delete project--approval level', 'success')
             timeslot_obj.delete()
